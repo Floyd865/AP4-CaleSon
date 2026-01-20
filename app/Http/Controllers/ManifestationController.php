@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Manifestation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ManifestationController extends Controller
 {
@@ -19,7 +20,8 @@ class ManifestationController extends Controller
         ];
 
         // Récupérer les manifestations avec filtres
-        $manifestations = Manifestation::getAllManifestations($filters);
+        // Changement ici : getAllManifestations() devient filter()
+        $manifestations = Manifestation::filter($filters);
 
         // Calculer les places restantes pour chaque manifestation
         foreach ($manifestations as $manif) {
@@ -29,7 +31,7 @@ class ManifestationController extends Controller
         // Récupérer les options de filtrage
         $filterOptions = Manifestation::getFilterOptions();
 
-        return view('manifestations.index', [
+        return view('manifestation.index', [
             'manifestations' => $manifestations,
             'filterOptions' => $filterOptions,
             'filters' => $filters
@@ -38,9 +40,8 @@ class ManifestationController extends Controller
 
     public function show($id)
     {
-        $manifestation = \DB::table('all_manifestation')
-            ->where('idmanif', $id)
-            ->first();
+        // Utiliser directement la vue all_manifestation
+        $manifestation = Manifestation::where('idmanif', $id)->first();
 
         if (!$manifestation) {
             abort(404);
@@ -49,7 +50,7 @@ class ManifestationController extends Controller
         $placesRestantes = Manifestation::getPlacesRestantes($id);
 
         // Récupérer l'affiche si elle existe
-        $affiche = \DB::table('affiche')
+        $affiche = DB::table('affiche')
             ->where('idtheme', $manifestation->idtheme)
             ->first();
 

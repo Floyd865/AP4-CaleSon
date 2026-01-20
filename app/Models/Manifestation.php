@@ -7,37 +7,32 @@ use Illuminate\Support\Facades\DB;
 
 class Manifestation extends Model
 {
+    // Utilisez la vue au lieu de la table
     protected $table = 'all_manifestation';
-    protected $primaryKey = 'idmanif';
+    
     public $timestamps = false;
+    
+    protected $primaryKey = 'idmanif';
 
-    // Utiliser la vue pour récupérer toutes les manifestations
-    public static function getAllManifestations($filters = [])
+    // Filtrer les manifestations
+    public static function filter($filters = [])
     {
-        $query = DB::table('all_manifestation')
-            ->select([
-                'idmanif',
-                'nommanif',
-                'resumemanif',
-                'prixmanif',
-                'idcom',
-                'idtheme',
-                'idlieu',
-                'libellelieu',
-                'effectif_complet',
-                'dateheure',
-                'duree',
-                'type_manifestation',
-                'libellecom',
-                'libelletheme',
-                'annetheme',
-                'dateheure_fin'
-            ])
-            ->orderBy('dateheure', 'asc');
+        $query = self::query();
 
         // Filtrer par type
         if (!empty($filters['type'])) {
-            $query->where('type_manifestation', $filters['type']);
+            $type = $filters['type'];
+            $query->where(function($q) use ($type) {
+                if ($type == 'Concert') {
+                    $q->where('type_manifestation', 'Concert');
+                } elseif ($type == 'Conférence') {
+                    $q->where('type_manifestation', 'Conférence');
+                } elseif ($type == 'Atelier') {
+                    $q->where('type_manifestation', 'Atelier');
+                } elseif ($type == 'Exposition') {
+                    $q->where('type_manifestation', 'Exposition');
+                }
+            });
         }
 
         // Filtrer par date
@@ -58,24 +53,26 @@ class Manifestation extends Model
         // Filtrer payantes/gratuites
         if (isset($filters['payant'])) {
             if ($filters['payant'] === 'oui') {
-                $query->whereNotNull('prixmanif');
+                $query->where('prixmanif', '>', 0);
             } elseif ($filters['payant'] === 'non') {
-                $query->whereNull('prixmanif');
+                $query->where(function($q) {
+                    $q->whereNull('prixmanif')
+                      ->orWhere('prixmanif', '=', 0);
+                });
             }
         }
 
-        return $query->get();
+        return $query->orderBy('dateheure', 'asc')->get();
     }
 
     // Récupérer les filtres disponibles
     public static function getFilterOptions()
     {
+        // Types disponibles basés sur les tables spécifiques
+        $types = collect(['Concert', 'Conférence', 'Atelier', 'Exposition']);
+
         return [
-            'types' => DB::table('all_manifestation')
-                ->select('type_manifestation')
-                ->distinct()
-                ->orderBy('type_manifestation')
-                ->pluck('type_manifestation'),
+            'types' => $types,
             
             'lieux' => DB::table('lieu')
                 ->select('idlieu', 'libellelieu')
@@ -92,21 +89,42 @@ class Manifestation extends Model
     // Calculer les places restantes
     public static function getPlacesRestantes($idmanif)
     {
-        $manif = DB::table('all_manifestation')
-            ->where('idmanif', $idmanif)
-            ->first();
-
-        if (!$manif) {
+        // Récupérer l'effectif maximum depuis la vue
+        $manifestation = self::where('idmanif', $idmanif)->first();
+        
+        if (!$manifestation || !$manifestation->effectif_complet) {
             return 0;
         }
 
+        // Compter les réservations
         $reservations = DB::table('billet')
-            ->where('idmanif_concert', $idmanif)
-            ->orWhere('idmanif_conference', $idmanif)
-            ->orWhere('idmanif_atelier', $idmanif)
-            ->orWhere('idmanif_exposition', $idmanif)
+            ->where(function($query) use ($idmanif) {
+                $query->where('idmanif_concert', $idmanif)
+                    ->orWhere('idmanif_conference', $idmanif)
+                    ->orWhere('idmanif_atelier', $idmanif)
+                    ->orWhere('idmanif_exposition', $idmanif);
+            })
             ->count();
 
-        return $manif->effectif_complet - $reservations;
+        return max(0, $manifestation->effectif_complet - $reservations);
+    }
+    
+    // Récupérer toutes les manifestations à venir
+    public static function getUpcoming($limit = null)
+    {
+        $query = self::where('dateheure', '>=', now())
+                    ->orderBy('dateheure', 'asc');
+        
+        if ($limit) {
+            $query->limit($limit);
+        }
+        
+        return $query->get();
+    }
+    
+    // Récupérer une manifestation avec tous ses détails
+    public static function getWithDetails($idmanif)
+    {
+        return self::where('idmanif', $idmanif)->first();
     }
 }

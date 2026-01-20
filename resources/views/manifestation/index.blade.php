@@ -204,6 +204,30 @@
             text-align: center;
             color: #666;
         }
+
+        .card-price {
+        background: #f59e0b; /* Orange pour payant */
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+
+    .card-price.free {
+        background: #10b981; /* Vert pour gratuit */
+    }
+
+    /* Badge distinctif pour les manifestations payantes */
+    .manifestation-card.payante {
+        border-left: 4px solid #f59e0b;
+    }
+
+    .manifestation-card.gratuite {
+        border-left: 4px solid #10b981;
+    }
     </style>
 </head>
 <body>
@@ -277,16 +301,28 @@
         @if($manifestations->count() > 0)
             <div class="manifestations-grid">
                 @foreach($manifestations as $manif)
-                    <div class="manifestation-card">
+                    <div class="manifestation-card {{ is_null($manif->prixmanif) ? 'gratuite' : 'payante' }}">
                         <div class="card-header">
                             <span class="card-type">{{ $manif->type_manifestation }}</span>
-                            <span class="card-price {{ is_null($manif->prixmanif) ? 'free' : '' }}">
-                                {{ is_null($manif->prixmanif) ? 'Gratuit' : $manif->prixmanif . ' €' }}
-                            </span>
+                                @if(is_null($manif->prixmanif))
+                                    <span class="card-price free">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Gratuit
+                                    </span>
+                                @else
+                                    <span class="card-price">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {{ number_format($manif->prixmanif, 2, ',', ' ') }} €
+                                </span>
+                            @endif
                         </div>
 
+                            
                         <h2 class="card-title">{{ $manif->nommanif }}</h2>
-
                         <div class="card-info">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
