@@ -2,24 +2,25 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
-class DatabaseSeeder extends Seeder
+class PaiementSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
-     * Seed the application's database.
+     * Run the database seeds.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $paiements = [
+            ['idpaiement' => 1, 'libellepaiement' => 'Carte bancaire'],
+            ['idpaiement' => 2, 'libellepaiement' => 'Espèces'],
+            ['idpaiement' => 3, 'libellepaiement' => 'Chèque'],
+            ['idpaiement' => 4, 'libellepaiement' => 'Virement'],
+        ];
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        foreach ($paiements as $paiement) {
+            DB::table('paiement')->insertOrIgnore($paiement);
+        }
     }
 }

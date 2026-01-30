@@ -27,11 +27,13 @@ Route::get('/manifestations/{id}', [ManifestationController::class, 'show'])->na
 
 // Routes de réservation (nécessitent l'authentification)
 Route::middleware('auth')->group(function () {
-    // Afficher le formulaire de réservation
+    // Réservations GRATUITES
     Route::get('/manifestations/{id}/reserver', [ReservationController::class, 'create'])->name('reservations.create');
-    
-    // Enregistrer la réservation
     Route::post('/manifestations/{id}/reserver', [ReservationController::class, 'store'])->name('reservations.store');
+    
+    // Réservations PAYANTES
+    Route::get('/manifestations/{id}/reserver-payant', [ReservationController::class, 'createPayant'])->name('reservations.create-payant');
+    Route::post('/manifestations/{id}/reserver-payant', [ReservationController::class, 'storePayant'])->name('reservations.store-payant');
     
     // Voir mes réservations
     Route::get('/mes-reservations', [ReservationController::class, 'mesReservations'])->name('reservations.index');
