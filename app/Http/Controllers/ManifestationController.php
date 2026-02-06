@@ -31,7 +31,7 @@ class ManifestationController extends Controller
         // Récupérer les options de filtrage
         $filterOptions = Manifestation::getFilterOptions();
 
-        return view('manifestation.index', [
+        return view('manifestations.index', [
             'manifestations' => $manifestations,
             'filterOptions' => $filterOptions,
             'filters' => $filters

@@ -93,14 +93,22 @@ class ReservationController extends Controller
                 $numeroBillet = $this->genererNumeroBillet();
                 $qrCode = $this->genererQRCode($numeroBillet, $idmanif);
 
-                DB::table('billet')->insert([
-                    $typeManif => $idmanif,
-                    'idinscription' => $userId,
-                    'numticket' => $numeroBillet,
-                    'codeqr' => $qrCode,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]);
+                // Préparer les données avec toutes les colonnes idmanif_* à NULL sauf celle concernée
+                $data = [
+                    'idmanif_concert' => DB::raw('NULL'),
+                    'idmanif_conference' => DB::raw('NULL'),
+                    'idmanif_atelier' => DB::raw('NULL'),
+                    'idmanif_exposition' => DB::raw('NULL'),
+                    'iduser' => $userId,
+                    'qr_code' => $qrCode,
+                    'datereserv' => now(),
+                    'idpaiement' => DB::raw('NULL'),
+                ];
+                
+                // Définir le bon idmanif selon le type
+                $data[$typeManif] = $idmanif;
+
+                DB::table('billet')->insert($data);
             }
 
             DB::commit();
@@ -156,13 +164,32 @@ class ReservationController extends Controller
      */
     public function storePayant(Request $request, $idmanif)
     {
-        $request->validate([
+        // Validation des données
+        $validated = $request->validate([
             'nombre_places' => 'required|integer|min:1|max:4',
-            'card_number' => 'required|string|size:16',
+            'card_number' => 'required|digits:16',
             'card_name' => 'required|string|max:100',
-            'card_expiry' => 'required|string|regex:/^(0[1-9]|1[0-2])\/[0-9]{2}$/',
-            'card_cvv' => 'required|string|size:3'
+            'card_expiry' => 'required|string|size:5',
+            'card_cvv' => 'required|digits:3'
+        ], [
+            'nombre_places.required' => 'Le nombre de places est requis',
+            'nombre_places.min' => 'Vous devez réserver au moins 1 place',
+            'nombre_places.max' => 'Vous ne pouvez pas réserver plus de 4 places',
+            'card_number.required' => 'Le numéro de carte est requis',
+            'card_number.digits' => 'Le numéro de carte doit contenir exactement 16 chiffres',
+            'card_name.required' => 'Le nom du titulaire est requis',
+            'card_expiry.required' => 'La date d\'expiration est requise',
+            'card_expiry.size' => 'La date d\'expiration doit être au format MM/AA',
+            'card_cvv.required' => 'Le CVV est requis',
+            'card_cvv.digits' => 'Le CVV doit contenir exactement 3 chiffres'
         ]);
+
+        // Vérifier le format de la date d'expiration
+        if (!preg_match('/^(0[1-9]|1[0-2])\/[0-9]{2}$/', $request->card_expiry)) {
+            return redirect()->back()
+                ->with('error', 'La date d\'expiration doit être au format MM/AA (ex: 12/28)')
+                ->withInput();
+        }
 
         $manifestation = Manifestation::where('idmanif', $idmanif)->first();
 
@@ -205,26 +232,6 @@ class ReservationController extends Controller
         try {
             DB::beginTransaction();
 
-            // Enregistrer la transaction de paiement
-            $referenceTransaction = $this->genererReferenceTransaction();
-            $derniers4Chiffres = substr($request->card_number, -4);
-            
-            $idTransaction = DB::table('transaction_paiement')->insertGetId([
-                'idinscription' => $userId,
-                'idpaiement' => 1, // 1 = Carte bancaire (selon votre table paiement)
-                'montant' => $montantTotal,
-                'date_transaction' => now(),
-                'statut' => 'valide',
-                'reference_transaction' => $referenceTransaction,
-                'details_carte' => json_encode([
-                    'derniers_chiffres' => $derniers4Chiffres,
-                    'nom' => $request->card_name,
-                    'expiration' => $request->card_expiry
-                ]),
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-
             // Créer les billets
             $typeManif = $this->getTypeManifestationColumn($manifestation->type_manifestation);
             $billets = [];
@@ -233,19 +240,25 @@ class ReservationController extends Controller
                 $numeroBillet = $this->genererNumeroBillet();
                 $qrCode = $this->genererQRCode($numeroBillet, $idmanif);
 
-                $idBillet = DB::table('billet')->insertGetId([
-                    $typeManif => $idmanif,
-                    'idinscription' => $userId,
-                    'idtransaction' => $idTransaction,
-                    'numticket' => $numeroBillet,
-                    'codeqr' => $qrCode,
-                    'prix_paye' => $manifestation->prixmanif,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]);
+                // Préparer les données avec toutes les colonnes idmanif_* à NULL sauf celle concernée
+                $data = [
+                    'idmanif_concert' => DB::raw(''),
+                    'idmanif_conference' => DB::raw(''),
+                    'idmanif_atelier' => DB::raw(''),
+                    'idmanif_exposition' => DB::raw(''),
+                    'iduser' => $userId,
+                    'qr_code' => $qrCode,
+                    'datereserv' => now(),
+                    'idpaiement' => DB::raw('NULL'),
+                ];
+                
+                // Définir le bon idmanif selon le type
+                $data[$typeManif] = $idmanif;
+
+                $idBillet = DB::table('billet')->insertGetId($data);
 
                 $billets[] = [
-                    'id' => $idBillet,
+                    'idreserve' => $idBillet,
                     'numero' => $numeroBillet,
                     'qr_code' => $qrCode
                 ];
@@ -253,11 +266,8 @@ class ReservationController extends Controller
 
             DB::commit();
 
-            // TODO: Générer et envoyer les billets PDF par email
-            // $this->genererEtEnvoyerBillets($billets, $manifestation, $userId, $referenceTransaction);
-
-            return redirect()->route('reservations.index')
-                ->with('success', "Paiement de " . number_format($montantTotal, 2, ',', ' ') . " € réussi ! $nombrePlaces place(s) réservée(s). Référence : $referenceTransaction");
+            return redirect()->route('manifestations.show', $idmanif)
+                ->with('success', "Paiement de " . number_format($montantTotal, 2, ',', ' ') . " € réussi ! $nombrePlaces place(s) réservée(s).");
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -265,40 +275,9 @@ class ReservationController extends Controller
             \Log::error('Erreur réservation payante: ' . $e->getMessage());
             
             return redirect()->back()
-                ->with('error', 'Une erreur est survenue lors de la réservation. Veuillez réessayer.')
+                ->with('error', 'Une erreur est survenue lors de la réservation : ' . $e->getMessage())
                 ->withInput();
         }
-    }
-
-    /**
-     * Afficher les réservations de l'utilisateur connecté
-     */
-    public function mesReservations()
-    {
-        $userId = Auth::id();
-
-        $reservations = DB::table('billet')
-            ->join('all_manifestation', function($join) {
-                $join->on('billet.idmanif_concert', '=', 'all_manifestation.idmanif')
-                    ->orOn('billet.idmanif_conference', '=', 'all_manifestation.idmanif')
-                    ->orOn('billet.idmanif_atelier', '=', 'all_manifestation.idmanif')
-                    ->orOn('billet.idmanif_exposition', '=', 'all_manifestation.idmanif');
-            })
-            ->leftJoin('transaction_paiement', 'billet.idtransaction', '=', 'transaction_paiement.idtransaction')
-            ->where('billet.idinscription', $userId)
-            ->select(
-                'billet.*', 
-                'all_manifestation.*',
-                'transaction_paiement.montant as montant_paye',
-                'transaction_paiement.reference_transaction',
-                'transaction_paiement.date_transaction'
-            )
-            ->orderBy('all_manifestation.dateheure', 'asc')
-            ->get();
-
-        return view('reservations.index', [
-            'reservations' => $reservations
-        ]);
     }
 
     /**
@@ -307,7 +286,7 @@ class ReservationController extends Controller
     private function getReservationsUtilisateur($idmanif, $userId)
     {
         return DB::table('billet')
-            ->where('idinscription', $userId)
+            ->where('iduser', $userId)
             ->where(function($query) use ($idmanif) {
                 $query->where('idmanif_concert', $idmanif)
                     ->orWhere('idmanif_conference', $idmanif)
@@ -339,7 +318,7 @@ class ReservationController extends Controller
     {
         do {
             $numero = 'TICKET-' . strtoupper(Str::random(10));
-            $existe = DB::table('billet')->where('numticket', $numero)->exists();
+            $existe = DB::table('billet')->where('qr_code', $numero)->exists();
         } while ($existe);
 
         return $numero;
@@ -362,23 +341,7 @@ class ReservationController extends Controller
     }
 
     /**
-     * Générer une référence de transaction unique
-     */
-    private function genererReferenceTransaction()
-    {
-        do {
-            $reference = 'TRX-' . date('Ymd') . '-' . strtoupper(Str::random(8));
-            $existe = DB::table('transaction_paiement')
-                ->where('reference_transaction', $reference)
-                ->exists();
-        } while ($existe);
-
-        return $reference;
-    }
-
-    /**
      * Simuler un paiement par carte bancaire
-     * Dans un environnement de production, ceci serait remplacé par une vraie API de paiement
      */
     private function simulerPaiement($cardData, $montant)
     {
@@ -429,4 +392,46 @@ class ReservationController extends Controller
 
         return ($sum % 10 === 0);
     }
+
+    /**
+     * Afficher les réservations de l'utilisateur connecté
+     */
+    public function mesReservations()
+    {
+        $userId = Auth::id();
+
+        // Récupérer tous les billets de l'utilisateur avec les informations des manifestations
+        $billets = DB::table('billet')
+            ->where('iduser', $userId)
+            ->leftJoin('all_manifestation as manif', function($join) {
+                $join->on('billet.idmanif_concert', '=', 'manif.idmanif')
+                    ->orOn('billet.idmanif_conference', '=', 'manif.idmanif')
+                    ->orOn('billet.idmanif_atelier', '=', 'manif.idmanif')
+                    ->orOn('billet.idmanif_exposition', '=', 'manif.idmanif');
+            })
+            ->select(
+                'billet.*',
+                'manif.nommanif',
+                'manif.dateheure',
+                'manif.type_manifestation',
+                'manif.libellelieu',
+                'manif.prixmanif'
+            )
+            ->orderBy('manif.dateheure', 'desc')
+            ->get();
+
+        // Grouper par manifestation
+        $reservations = $billets->groupBy('nommanif')->map(function ($group) {
+            return [
+                'manifestation' => $group->first(),
+                'nombre_billets' => $group->count(),
+                'billets' => $group
+            ];
+        });
+
+        return view('reservations.index', [
+            'reservations' => $reservations
+        ]);
+    }
+
 }
