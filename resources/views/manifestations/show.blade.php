@@ -375,17 +375,29 @@
                         <div class="alert alert-info">
                             ℹ️ Cette manifestation est gratuite. Vous pouvez réserver jusqu'à 4 places.
                         </div>
-                        <a href="{{ route('reservations.create', $manifestation->idmanif) }}" class="btn btn-success">
-                            ✓ Réserver gratuitement
-                        </a>
+                        @if($type === 'atelier' && isset($date))
+                            <a href="{{ route('reservations.create.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" class="btn btn-success">
+                                ✓ Réserver gratuitement
+                            </a>
+                        @else
+                            <a href="{{ route('reservations.create', ['type' => $type, 'id' => $manifestation->idmanif]) }}" class="btn btn-success">
+                                ✓ Réserver gratuitement
+                            </a>
+                        @endif
                     @else
                         <!-- Réservation payante -->
                         <div class="alert alert-warning">
                             💳 Cette manifestation est payante ({{ number_format($manifestation->prixmanif, 2, ',', ' ') }} € par place). Un paiement sera requis.
                         </div>
-                        <a href="{{ route('reservations.create-payant', $manifestation->idmanif) }}" class="btn btn-warning">
-                            💳 Réserver avec paiement
-                        </a>
+                        @if($type === 'atelier' && isset($date))
+                            <a href="{{ route('reservations.create-payant.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" class="btn btn-warning">
+                                💳 Réserver avec paiement
+                            </a>
+                        @else
+                            <a href="{{ route('reservations.create-payant', ['type' => $type, 'id' => $manifestation->idmanif]) }}" class="btn btn-warning">
+                                💳 Réserver avec paiement
+                            </a>
+                        @endif
                     @endif
                 @else
                     <!-- Plus de places -->

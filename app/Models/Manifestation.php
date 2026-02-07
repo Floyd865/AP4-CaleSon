@@ -86,27 +86,113 @@ class Manifestation extends Model
         ];
     }
 
-    // Calculer les places restantes
-    public static function getPlacesRestantes($idmanif)
+    // Calculer les places restantes - AVEC type pour éviter l'ambiguïté
+    public static function getPlacesRestantes($idmanif, $type = null)
     {
         // Récupérer l'effectif maximum depuis la vue
-        $manifestation = self::where('idmanif', $idmanif)->first();
+        $query = self::where('idmanif', $idmanif);
+        
+        // Si le type est fourni, on filtre aussi par type
+        if ($type) {
+            $typeLabel = self::getTypeLabelFromSlug($type);
+            $query->where('type_manifestation', $typeLabel);
+        }
+        
+        $manifestation = $query->first();
         
         if (!$manifestation || !$manifestation->effectif_complet) {
             return 0;
         }
 
-        // Compter les réservations
+        // Compter les réservations UNIQUEMENT pour le bon type
+        $column = self::getColumnFromType($type ?? self::getTypeSlugFromLabel($manifestation->type_manifestation));
+        
         $reservations = DB::table('billet')
-            ->where(function($query) use ($idmanif) {
-                $query->where('idmanif_concert', $idmanif)
-                    ->orWhere('idmanif_conference', $idmanif)
-                    ->orWhere('idmanif_atelier', $idmanif)
-                    ->orWhere('idmanif_exposition', $idmanif);
-            })
+            ->where($column, $idmanif)
             ->count();
 
         return max(0, $manifestation->effectif_complet - $reservations);
+    }
+    
+    // Récupérer une manifestation par ID ET type (sans ambiguïté)
+    // Pour Concert/Conférence/Exposition uniquement
+    public static function findByTypeAndId($type, $idmanif)
+    {
+        $typeLabel = self::getTypeLabelFromSlug($type);
+        return self::where('idmanif', $idmanif)
+                   ->where('type_manifestation', $typeLabel)
+                   ->first();
+    }
+    
+    // Récupérer un atelier par ID ET date (pour les séances multiples)
+    public static function findAtelierByIdAndDate($idmanif, $date)
+    {
+        return self::where('idmanif', $idmanif)
+                   ->where('type_manifestation', 'Atelier')
+                   ->whereDate('dateheure', $date)
+                   ->first();
+    }
+    
+    // Calculer les places restantes pour un atelier (avec date)
+    public static function getPlacesRestantesAtelier($idmanif, $date)
+    {
+        $manifestation = self::findAtelierByIdAndDate($idmanif, $date);
+        
+        if (!$manifestation || !$manifestation->effectif_complet) {
+            return 0;
+        }
+
+        // Pour les ateliers, on compte les billets pour cette manifestation
+        // Note: les billets d'atelier sont liés à idmanif, pas à la date
+        // Car un billet = accès à l'atelier (toutes séances ou séance spécifique selon règle métier)
+        $reservations = DB::table('billet')
+            ->where('idmanif_atelier', $idmanif)
+            ->count();
+
+        return max(0, $manifestation->effectif_complet - $reservations);
+    }
+    
+    // Obtenir le slug de date pour les URLs (format YYYY-MM-DD)
+    public static function getDateSlug($dateheure)
+    {
+        if (!$dateheure) return null;
+        return date('Y-m-d', strtotime($dateheure));
+    }
+    
+    // Convertir le slug URL en label de type
+    public static function getTypeLabelFromSlug($slug)
+    {
+        $mapping = [
+            'concert' => 'Concert',
+            'conference' => 'Conférence',
+            'atelier' => 'Atelier',
+            'exposition' => 'Exposition'
+        ];
+        return $mapping[$slug] ?? 'Concert';
+    }
+    
+    // Convertir le label en slug URL
+    public static function getTypeSlugFromLabel($label)
+    {
+        $mapping = [
+            'Concert' => 'concert',
+            'Conférence' => 'conference',
+            'Atelier' => 'atelier',
+            'Exposition' => 'exposition'
+        ];
+        return $mapping[$label] ?? 'concert';
+    }
+    
+    // Récupérer le nom de la colonne dans la table billet selon le type
+    public static function getColumnFromType($type)
+    {
+        $mapping = [
+            'concert' => 'idmanif_concert',
+            'conference' => 'idmanif_conference',
+            'atelier' => 'idmanif_atelier',
+            'exposition' => 'idmanif_exposition'
+        ];
+        return $mapping[$type] ?? 'idmanif_concert';
     }
     
     // Récupérer toutes les manifestations à venir

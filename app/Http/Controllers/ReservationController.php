@@ -12,10 +12,13 @@ class ReservationController extends Controller
 {
     /**
      * Afficher le formulaire de réservation gratuite
+     * @param string $type - Type de manifestation (concert, conference, atelier, exposition)
+     * @param int $idmanif - ID de la manifestation
      */
-    public function create($idmanif)
+    public function create($type, $idmanif)
     {
-        $manifestation = Manifestation::where('idmanif', $idmanif)->first();
+        // Recherche avec type ET id pour éviter l'ambiguïté
+        $manifestation = Manifestation::findByTypeAndId($type, $idmanif);
 
         if (!$manifestation) {
             abort(404, 'Manifestation introuvable');
@@ -23,52 +26,53 @@ class ReservationController extends Controller
 
         // Vérifier que la manifestation est gratuite
         if (!is_null($manifestation->prixmanif) && $manifestation->prixmanif > 0) {
-            return redirect()->route('manifestations.show', $idmanif)
+            return redirect()->route('manifestations.show', ['type' => $type, 'id' => $idmanif])
                 ->with('error', 'Cette manifestation est payante. Utilisez le système de réservation payant.');
         }
 
-        $placesRestantes = Manifestation::getPlacesRestantes($idmanif);
+        $placesRestantes = Manifestation::getPlacesRestantes($idmanif, $type);
 
         if ($placesRestantes <= 0) {
-            return redirect()->route('manifestations.show', $idmanif)
+            return redirect()->route('manifestations.show', ['type' => $type, 'id' => $idmanif])
                 ->with('error', 'Il n\'y a plus de places disponibles pour cette manifestation.');
         }
 
-        $reservationsExistantes = $this->getReservationsUtilisateur($idmanif, Auth::id());
+        $reservationsExistantes = $this->getReservationsUtilisateur($idmanif, Auth::id(), $type);
         $placesDejaReservees = $reservationsExistantes;
 
         return view('reservations.create', [
             'manifestation' => $manifestation,
             'placesRestantes' => $placesRestantes,
             'placesDejaReservees' => $placesDejaReservees,
-            'maxPlacesDisponibles' => min(4 - $placesDejaReservees, $placesRestantes)
+            'maxPlacesDisponibles' => min(4 - $placesDejaReservees, $placesRestantes),
+            'type' => $type  // Passer le type à la vue
         ]);
     }
 
     /**
      * Enregistrer une réservation gratuite
      */
-    public function store(Request $request, $idmanif)
+    public function store(Request $request, $type, $idmanif)
     {
         $request->validate([
             'nombre_places' => 'required|integer|min:1|max:4'
         ]);
 
-        $manifestation = Manifestation::where('idmanif', $idmanif)->first();
+        $manifestation = Manifestation::findByTypeAndId($type, $idmanif);
 
         if (!$manifestation) {
             abort(404, 'Manifestation introuvable');
         }
 
         if (!is_null($manifestation->prixmanif) && $manifestation->prixmanif > 0) {
-            return redirect()->route('manifestations.show', $idmanif)
+            return redirect()->route('manifestations.show', ['type' => $type, 'id' => $idmanif])
                 ->with('error', 'Cette manifestation n\'est pas gratuite.');
         }
 
         $nombrePlaces = $request->input('nombre_places');
         $userId = Auth::id();
 
-        $placesDejaReservees = $this->getReservationsUtilisateur($idmanif, $userId);
+        $placesDejaReservees = $this->getReservationsUtilisateur($idmanif, $userId, $type);
 
         if ($placesDejaReservees + $nombrePlaces > 4) {
             return redirect()->back()
@@ -76,7 +80,7 @@ class ReservationController extends Controller
                 ->withInput();
         }
 
-        $placesRestantes = Manifestation::getPlacesRestantes($idmanif);
+        $placesRestantes = Manifestation::getPlacesRestantes($idmanif, $type);
 
         if ($nombrePlaces > $placesRestantes) {
             return redirect()->back()
@@ -87,40 +91,49 @@ class ReservationController extends Controller
         try {
             DB::beginTransaction();
 
-            $typeManif = $this->getTypeManifestationColumn($manifestation->type_manifestation);
+            // Utiliser le type passé en paramètre (plus fiable)
+            $column = Manifestation::getColumnFromType($type);
             
             for ($i = 0; $i < $nombrePlaces; $i++) {
                 $numeroBillet = $this->genererNumeroBillet();
-                $qrCode = $this->genererQRCode($numeroBillet, $idmanif);
+                $qrCode = $this->genererQRCode($numeroBillet, $idmanif, $type);
 
                 // Préparer les données avec toutes les colonnes idmanif_* à NULL sauf celle concernée
                 $data = [
-                    'idmanif_concert' => DB::raw('NULL'),
-                    'idmanif_conference' => DB::raw('NULL'),
-                    'idmanif_atelier' => DB::raw('NULL'),
-                    'idmanif_exposition' => DB::raw('NULL'),
+                    'idmanif_concert' => null,
+                    'idmanif_conference' => null,
+                    'idmanif_atelier' => null,
+                    'idmanif_exposition' => null,
                     'iduser' => $userId,
                     'qr_code' => $qrCode,
                     'datereserv' => now(),
-                    'idpaiement' => DB::raw('NULL'),
+                    'idpaiement' => null,
                 ];
                 
                 // Définir le bon idmanif selon le type
-                $data[$typeManif] = $idmanif;
+                $data[$column] = $idmanif;
 
                 DB::table('billet')->insert($data);
             }
 
             DB::commit();
 
-            return redirect()->route('manifestations.show', $idmanif)
+            return redirect()->route('manifestations.show', ['type' => $type, 'id' => $idmanif])
                 ->with('success', "Réservation confirmée ! $nombrePlaces place(s) réservée(s). Vous allez recevoir un email de confirmation.");
 
         } catch (\Exception $e) {
             DB::rollBack();
             
+            // Détecter les erreurs du trigger PostgreSQL
+            $message = 'Une erreur est survenue lors de la réservation. Veuillez réessayer.';
+            if (str_contains($e->getMessage(), 'capacité maximal')) {
+                $message = 'Désolé, la manifestation a atteint sa capacité maximale.';
+            } elseif (str_contains($e->getMessage(), '4 réservation')) {
+                $message = 'Vous avez déjà atteint le maximum de 4 réservations pour cette manifestation.';
+            }
+            
             return redirect()->back()
-                ->with('error', 'Une erreur est survenue lors de la réservation. Veuillez réessayer.')
+                ->with('error', $message)
                 ->withInput();
         }
     }
@@ -128,9 +141,9 @@ class ReservationController extends Controller
     /**
      * Afficher le formulaire de réservation payante
      */
-    public function createPayant($idmanif)
+    public function createPayant($type, $idmanif)
     {
-        $manifestation = Manifestation::where('idmanif', $idmanif)->first();
+        $manifestation = Manifestation::findByTypeAndId($type, $idmanif);
 
         if (!$manifestation) {
             abort(404, 'Manifestation introuvable');
@@ -138,31 +151,32 @@ class ReservationController extends Controller
 
         // Vérifier que la manifestation est payante
         if (is_null($manifestation->prixmanif) || $manifestation->prixmanif <= 0) {
-            return redirect()->route('manifestations.show', $idmanif)
+            return redirect()->route('manifestations.show', ['type' => $type, 'id' => $idmanif])
                 ->with('error', 'Cette manifestation est gratuite. Utilisez le système de réservation gratuit.');
         }
 
-        $placesRestantes = Manifestation::getPlacesRestantes($idmanif);
+        $placesRestantes = Manifestation::getPlacesRestantes($idmanif, $type);
 
         if ($placesRestantes <= 0) {
-            return redirect()->route('manifestations.show', $idmanif)
+            return redirect()->route('manifestations.show', ['type' => $type, 'id' => $idmanif])
                 ->with('error', 'Il n\'y a plus de places disponibles pour cette manifestation.');
         }
 
-        $placesDejaReservees = $this->getReservationsUtilisateur($idmanif, Auth::id());
+        $placesDejaReservees = $this->getReservationsUtilisateur($idmanif, Auth::id(), $type);
 
         return view('reservations.create-payant', [
             'manifestation' => $manifestation,
             'placesRestantes' => $placesRestantes,
             'placesDejaReservees' => $placesDejaReservees,
-            'maxPlacesDisponibles' => min(4 - $placesDejaReservees, $placesRestantes)
+            'maxPlacesDisponibles' => min(4 - $placesDejaReservees, $placesRestantes),
+            'type' => $type
         ]);
     }
 
     /**
      * Traiter le paiement et créer la réservation payante
      */
-    public function storePayant(Request $request, $idmanif)
+    public function storePayant(Request $request, $type, $idmanif)
     {
         // Validation des données
         $validated = $request->validate([
@@ -191,17 +205,17 @@ class ReservationController extends Controller
                 ->withInput();
         }
 
-        $manifestation = Manifestation::where('idmanif', $idmanif)->first();
+        $manifestation = Manifestation::findByTypeAndId($type, $idmanif);
 
         if (!$manifestation || is_null($manifestation->prixmanif) || $manifestation->prixmanif <= 0) {
-            return redirect()->route('manifestations.show', $idmanif)
+            return redirect()->route('manifestations.show', ['type' => $type, 'id' => $idmanif])
                 ->with('error', 'Cette manifestation n\'est pas payante.');
         }
 
         $nombrePlaces = $request->input('nombre_places');
         $userId = Auth::id();
 
-        $placesDejaReservees = $this->getReservationsUtilisateur($idmanif, $userId);
+        $placesDejaReservees = $this->getReservationsUtilisateur($idmanif, $userId, $type);
 
         if ($placesDejaReservees + $nombrePlaces > 4) {
             return redirect()->back()
@@ -209,7 +223,7 @@ class ReservationController extends Controller
                 ->withInput();
         }
 
-        $placesRestantes = Manifestation::getPlacesRestantes($idmanif);
+        $placesRestantes = Manifestation::getPlacesRestantes($idmanif, $type);
 
         if ($nombrePlaces > $placesRestantes) {
             return redirect()->back()
@@ -232,41 +246,34 @@ class ReservationController extends Controller
         try {
             DB::beginTransaction();
 
-            // Créer les billets
-            $typeManif = $this->getTypeManifestationColumn($manifestation->type_manifestation);
-            $billets = [];
+            // Utiliser le type passé en paramètre
+            $column = Manifestation::getColumnFromType($type);
 
             for ($i = 0; $i < $nombrePlaces; $i++) {
                 $numeroBillet = $this->genererNumeroBillet();
-                $qrCode = $this->genererQRCode($numeroBillet, $idmanif);
+                $qrCode = $this->genererQRCode($numeroBillet, $idmanif, $type);
 
                 // Préparer les données avec toutes les colonnes idmanif_* à NULL sauf celle concernée
                 $data = [
-                    'idmanif_concert' => DB::raw(''),
-                    'idmanif_conference' => DB::raw(''),
-                    'idmanif_atelier' => DB::raw(''),
-                    'idmanif_exposition' => DB::raw(''),
+                    'idmanif_concert' => null,
+                    'idmanif_conference' => null,
+                    'idmanif_atelier' => null,
+                    'idmanif_exposition' => null,
                     'iduser' => $userId,
                     'qr_code' => $qrCode,
                     'datereserv' => now(),
-                    'idpaiement' => DB::raw('NULL'),
+                    'idpaiement' => 3, // 3 = Carte bancaire
                 ];
                 
                 // Définir le bon idmanif selon le type
-                $data[$typeManif] = $idmanif;
+                $data[$column] = $idmanif;
 
-                $idBillet = DB::table('billet')->insertGetId($data);
-
-                $billets[] = [
-                    'idreserve' => $idBillet,
-                    'numero' => $numeroBillet,
-                    'qr_code' => $qrCode
-                ];
+                DB::table('billet')->insert($data);
             }
 
             DB::commit();
 
-            return redirect()->route('manifestations.show', $idmanif)
+            return redirect()->route('manifestations.show', ['type' => $type, 'id' => $idmanif])
                 ->with('success', "Paiement de " . number_format($montantTotal, 2, ',', ' ') . " € réussi ! $nombrePlaces place(s) réservée(s).");
 
         } catch (\Exception $e) {
@@ -274,41 +281,35 @@ class ReservationController extends Controller
             
             \Log::error('Erreur réservation payante: ' . $e->getMessage());
             
+            // Détecter les erreurs du trigger PostgreSQL
+            $message = 'Une erreur est survenue lors de la réservation.';
+            if (str_contains($e->getMessage(), 'capacité maximal')) {
+                $message = 'Désolé, la manifestation a atteint sa capacité maximale.';
+            } elseif (str_contains($e->getMessage(), '4 réservation')) {
+                $message = 'Vous avez déjà atteint le maximum de 4 réservations pour cette manifestation.';
+            }
+            
             return redirect()->back()
-                ->with('error', 'Une erreur est survenue lors de la réservation : ' . $e->getMessage())
+                ->with('error', $message)
                 ->withInput();
         }
     }
 
     /**
      * Récupérer le nombre de places déjà réservées par un utilisateur
+     * @param int $idmanif - ID de la manifestation
+     * @param int $userId - ID de l'utilisateur
+     * @param string $type - Type de manifestation (concert, conference, etc.)
      */
-    private function getReservationsUtilisateur($idmanif, $userId)
+    private function getReservationsUtilisateur($idmanif, $userId, $type)
     {
+        // Utiliser uniquement la colonne correspondant au type
+        $column = Manifestation::getColumnFromType($type);
+        
         return DB::table('billet')
             ->where('iduser', $userId)
-            ->where(function($query) use ($idmanif) {
-                $query->where('idmanif_concert', $idmanif)
-                    ->orWhere('idmanif_conference', $idmanif)
-                    ->orWhere('idmanif_atelier', $idmanif)
-                    ->orWhere('idmanif_exposition', $idmanif);
-            })
+            ->where($column, $idmanif)
             ->count();
-    }
-
-    /**
-     * Déterminer la colonne à utiliser selon le type de manifestation
-     */
-    private function getTypeManifestationColumn($type)
-    {
-        $mapping = [
-            'Concert' => 'idmanif_concert',
-            'Conférence' => 'idmanif_conference',
-            'Atelier' => 'idmanif_atelier',
-            'Exposition' => 'idmanif_exposition'
-        ];
-
-        return $mapping[$type] ?? 'idmanif_concert';
     }
 
     /**
@@ -326,18 +327,29 @@ class ReservationController extends Controller
 
     /**
      * Générer un code QR pour le billet
+     * @param string $numeroBillet - Numéro du billet
+     * @param int $idmanif - ID de la manifestation
+     * @param string $type - Type de manifestation
+     * @param string|null $date - Date de la séance (pour les ateliers)
      */
-    private function genererQRCode($numeroBillet, $idmanif)
+    private function genererQRCode($numeroBillet, $idmanif, $type = 'concert', $date = null)
     {
-        // Format du QR code : BILLET|NUMERO|MANIFESTATION|TIMESTAMP
-        $data = implode('|', [
+        // Format du QR code : BILLET|NUMERO|TYPE|MANIFESTATION|DATE|TIMESTAMP
+        $parts = [
             'BILLET',
             $numeroBillet,
+            strtoupper($type),
             $idmanif,
-            time()
-        ]);
+        ];
+        
+        // Ajouter la date si c'est un atelier
+        if ($date) {
+            $parts[] = $date;
+        }
+        
+        $parts[] = time();
 
-        return base64_encode($data);
+        return base64_encode(implode('|', $parts));
     }
 
     /**
@@ -391,6 +403,259 @@ class ReservationController extends Controller
         }
 
         return ($sum % 10 === 0);
+    }
+
+    // ========================================
+    // MÉTHODES SPÉCIFIQUES AUX ATELIERS
+    // ========================================
+
+    /**
+     * Afficher le formulaire de réservation gratuite pour un atelier
+     */
+    public function createAtelier($idmanif, $date)
+    {
+        $manifestation = Manifestation::findAtelierByIdAndDate($idmanif, $date);
+
+        if (!$manifestation) {
+            abort(404, 'Séance d\'atelier introuvable');
+        }
+
+        if (!is_null($manifestation->prixmanif) && $manifestation->prixmanif > 0) {
+            return redirect()->route('manifestations.show.atelier', ['id' => $idmanif, 'date' => $date])
+                ->with('error', 'Cette séance est payante. Utilisez le système de réservation payant.');
+        }
+
+        $placesRestantes = Manifestation::getPlacesRestantesAtelier($idmanif, $date);
+
+        if ($placesRestantes <= 0) {
+            return redirect()->route('manifestations.show.atelier', ['id' => $idmanif, 'date' => $date])
+                ->with('error', 'Il n\'y a plus de places disponibles pour cette séance.');
+        }
+
+        $placesDejaReservees = $this->getReservationsUtilisateur($idmanif, Auth::id(), 'atelier');
+
+        return view('reservations.create', [
+            'manifestation' => $manifestation,
+            'placesRestantes' => $placesRestantes,
+            'placesDejaReservees' => $placesDejaReservees,
+            'maxPlacesDisponibles' => min(4 - $placesDejaReservees, $placesRestantes),
+            'type' => 'atelier',
+            'date' => $date
+        ]);
+    }
+
+    /**
+     * Enregistrer une réservation gratuite pour un atelier
+     */
+    public function storeAtelier(Request $request, $idmanif, $date)
+    {
+        $request->validate([
+            'nombre_places' => 'required|integer|min:1|max:4'
+        ]);
+
+        $manifestation = Manifestation::findAtelierByIdAndDate($idmanif, $date);
+
+        if (!$manifestation) {
+            abort(404, 'Séance d\'atelier introuvable');
+        }
+
+        if (!is_null($manifestation->prixmanif) && $manifestation->prixmanif > 0) {
+            return redirect()->route('manifestations.show.atelier', ['id' => $idmanif, 'date' => $date])
+                ->with('error', 'Cette séance n\'est pas gratuite.');
+        }
+
+        $nombrePlaces = $request->input('nombre_places');
+        $userId = Auth::id();
+
+        $placesDejaReservees = $this->getReservationsUtilisateur($idmanif, $userId, 'atelier');
+
+        if ($placesDejaReservees + $nombrePlaces > 4) {
+            return redirect()->back()
+                ->with('error', 'Vous ne pouvez pas réserver plus de 4 places au total pour cet atelier.')
+                ->withInput();
+        }
+
+        $placesRestantes = Manifestation::getPlacesRestantesAtelier($idmanif, $date);
+
+        if ($nombrePlaces > $placesRestantes) {
+            return redirect()->back()
+                ->with('error', "Il n'y a plus assez de places disponibles. Places restantes : $placesRestantes")
+                ->withInput();
+        }
+
+        try {
+            DB::beginTransaction();
+
+            for ($i = 0; $i < $nombrePlaces; $i++) {
+                $numeroBillet = $this->genererNumeroBillet();
+                $qrCode = $this->genererQRCode($numeroBillet, $idmanif, 'atelier', $date);
+
+                $data = [
+                    'idmanif_concert' => null,
+                    'idmanif_conference' => null,
+                    'idmanif_atelier' => $idmanif,
+                    'idmanif_exposition' => null,
+                    'iduser' => $userId,
+                    'qr_code' => $qrCode,
+                    'datereserv' => now(),
+                    'idpaiement' => null,
+                ];
+
+                DB::table('billet')->insert($data);
+            }
+
+            DB::commit();
+
+            return redirect()->route('manifestations.show.atelier', ['id' => $idmanif, 'date' => $date])
+                ->with('success', "Réservation confirmée ! $nombrePlaces place(s) réservée(s) pour la séance du $date.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            $message = 'Une erreur est survenue lors de la réservation. Veuillez réessayer.';
+            if (str_contains($e->getMessage(), 'capacité maximal')) {
+                $message = 'Désolé, cette séance a atteint sa capacité maximale.';
+            } elseif (str_contains($e->getMessage(), '4 réservation')) {
+                $message = 'Vous avez déjà atteint le maximum de 4 réservations pour cet atelier.';
+            }
+            
+            return redirect()->back()
+                ->with('error', $message)
+                ->withInput();
+        }
+    }
+
+    /**
+     * Afficher le formulaire de réservation payante pour un atelier
+     */
+    public function createPayantAtelier($idmanif, $date)
+    {
+        $manifestation = Manifestation::findAtelierByIdAndDate($idmanif, $date);
+
+        if (!$manifestation) {
+            abort(404, 'Séance d\'atelier introuvable');
+        }
+
+        if (is_null($manifestation->prixmanif) || $manifestation->prixmanif <= 0) {
+            return redirect()->route('manifestations.show.atelier', ['id' => $idmanif, 'date' => $date])
+                ->with('error', 'Cette séance est gratuite. Utilisez le système de réservation gratuit.');
+        }
+
+        $placesRestantes = Manifestation::getPlacesRestantesAtelier($idmanif, $date);
+
+        if ($placesRestantes <= 0) {
+            return redirect()->route('manifestations.show.atelier', ['id' => $idmanif, 'date' => $date])
+                ->with('error', 'Il n\'y a plus de places disponibles pour cette séance.');
+        }
+
+        $placesDejaReservees = $this->getReservationsUtilisateur($idmanif, Auth::id(), 'atelier');
+
+        return view('reservations.create-payant', [
+            'manifestation' => $manifestation,
+            'placesRestantes' => $placesRestantes,
+            'placesDejaReservees' => $placesDejaReservees,
+            'maxPlacesDisponibles' => min(4 - $placesDejaReservees, $placesRestantes),
+            'type' => 'atelier',
+            'date' => $date
+        ]);
+    }
+
+    /**
+     * Traiter le paiement et créer la réservation payante pour un atelier
+     */
+    public function storePayantAtelier(Request $request, $idmanif, $date)
+    {
+        $validated = $request->validate([
+            'nombre_places' => 'required|integer|min:1|max:4',
+            'card_number' => 'required|digits:16',
+            'card_name' => 'required|string|max:100',
+            'card_expiry' => 'required|string|size:5',
+            'card_cvv' => 'required|digits:3'
+        ]);
+
+        if (!preg_match('/^(0[1-9]|1[0-2])\/[0-9]{2}$/', $request->card_expiry)) {
+            return redirect()->back()
+                ->with('error', 'La date d\'expiration doit être au format MM/AA (ex: 12/28)')
+                ->withInput();
+        }
+
+        $manifestation = Manifestation::findAtelierByIdAndDate($idmanif, $date);
+
+        if (!$manifestation || is_null($manifestation->prixmanif) || $manifestation->prixmanif <= 0) {
+            return redirect()->route('manifestations.show.atelier', ['id' => $idmanif, 'date' => $date])
+                ->with('error', 'Cette séance n\'est pas payante.');
+        }
+
+        $nombrePlaces = $request->input('nombre_places');
+        $userId = Auth::id();
+
+        $placesDejaReservees = $this->getReservationsUtilisateur($idmanif, $userId, 'atelier');
+
+        if ($placesDejaReservees + $nombrePlaces > 4) {
+            return redirect()->back()
+                ->with('error', 'Vous ne pouvez pas réserver plus de 4 places au total pour cet atelier.')
+                ->withInput();
+        }
+
+        $placesRestantes = Manifestation::getPlacesRestantesAtelier($idmanif, $date);
+
+        if ($nombrePlaces > $placesRestantes) {
+            return redirect()->back()
+                ->with('error', "Il n'y a plus assez de places disponibles. Places restantes : $placesRestantes")
+                ->withInput();
+        }
+
+        $montantTotal = $nombrePlaces * $manifestation->prixmanif;
+        $paiementReussi = $this->simulerPaiement($request->all(), $montantTotal);
+
+        if (!$paiementReussi) {
+            return redirect()->back()
+                ->with('error', 'Le paiement a échoué. Veuillez vérifier vos informations bancaires et réessayer.')
+                ->withInput();
+        }
+
+        try {
+            DB::beginTransaction();
+
+            for ($i = 0; $i < $nombrePlaces; $i++) {
+                $numeroBillet = $this->genererNumeroBillet();
+                $qrCode = $this->genererQRCode($numeroBillet, $idmanif, 'atelier', $date);
+
+                $data = [
+                    'idmanif_concert' => null,
+                    'idmanif_conference' => null,
+                    'idmanif_atelier' => $idmanif,
+                    'idmanif_exposition' => null,
+                    'iduser' => $userId,
+                    'qr_code' => $qrCode,
+                    'datereserv' => now(),
+                    'idpaiement' => 3, // 3 = Carte bancaire
+                ];
+
+                DB::table('billet')->insert($data);
+            }
+
+            DB::commit();
+
+            return redirect()->route('manifestations.show.atelier', ['id' => $idmanif, 'date' => $date])
+                ->with('success', "Paiement de " . number_format($montantTotal, 2, ',', ' ') . " € réussi ! $nombrePlaces place(s) réservée(s).");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            \Log::error('Erreur réservation payante atelier: ' . $e->getMessage());
+            
+            $message = 'Une erreur est survenue lors de la réservation.';
+            if (str_contains($e->getMessage(), 'capacité maximal')) {
+                $message = 'Désolé, cette séance a atteint sa capacité maximale.';
+            } elseif (str_contains($e->getMessage(), '4 réservation')) {
+                $message = 'Vous avez déjà atteint le maximum de 4 réservations pour cet atelier.';
+            }
+            
+            return redirect()->back()
+                ->with('error', $message)
+                ->withInput();
+        }
     }
 
     /**

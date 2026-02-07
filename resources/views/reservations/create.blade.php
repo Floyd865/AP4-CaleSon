@@ -393,7 +393,11 @@
                 </div>
             @else
                 <!-- Formulaire de réservation -->
-                <form method="POST" action="{{ route('reservations.store', $manifestation->idmanif) }}" id="reservationForm">
+                @if(isset($type) && $type === 'atelier' && isset($date))
+                    <form method="POST" action="{{ route('reservations.store.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" id="reservationForm">
+                @else
+                    <form method="POST" action="{{ route('reservations.store', ['type' => $type, 'id' => $manifestation->idmanif]) }}" id="reservationForm">
+                @endif
                     @csrf
 
                     <div class="form-group">
@@ -448,9 +452,15 @@
                     </div>
 
                     <div class="buttons">
-                        <a href="{{ route('manifestations.show', $manifestation->idmanif) }}" class="btn btn-secondary">
-                            ← Annuler
-                        </a>
+                        @if(isset($type) && $type === 'atelier' && isset($date))
+                            <a href="{{ route('manifestations.show.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" class="btn btn-secondary">
+                                ← Annuler
+                            </a>
+                        @else
+                            <a href="{{ route('manifestations.show', ['type' => $type, 'id' => $manifestation->idmanif]) }}" class="btn btn-secondary">
+                                ← Annuler
+                            </a>
+                        @endif
                         <button type="submit" class="btn btn-primary">
                             ✓ Confirmer la réservation
                         </button>
@@ -468,6 +478,7 @@
                 const summaryPlaces = document.getElementById('summary_places');
                 summaryPlaces.textContent = nbPlaces + (nbPlaces > 1 ? ' places' : ' place');
             });
+        });
         });
 
         // Validation du formulaire

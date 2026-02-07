@@ -359,9 +359,15 @@
                             <span class="places-restantes {{ $placesClass }}">
                                 {{ $manif->places_restantes }} places restantes
                             </span>
-                            <a href="{{ route('manifestations.show', $manif->idmanif) }}" class="btn btn-primary">
-                                Voir détails
-                            </a>
+                            @if($manif->type_slug === 'atelier' && $manif->date_slug)
+                                <a href="{{ route('manifestations.show.atelier', ['id' => $manif->idmanif, 'date' => $manif->date_slug]) }}" class="btn btn-primary">
+                                    Voir détails
+                                </a>
+                            @else
+                                <a href="{{ route('manifestations.show', ['type' => $manif->type_slug, 'id' => $manif->idmanif]) }}" class="btn btn-primary">
+                                    Voir détails
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @endforeach

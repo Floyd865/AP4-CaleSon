@@ -23,17 +23,48 @@ require __DIR__.'/auth.php';
 
 // Routes publiques des manifestations
 Route::get('/manifestations', [ManifestationController::class, 'index'])->name('manifestations.index');
-Route::get('/manifestations/{id}', [ManifestationController::class, 'show'])->name('manifestations.show');
+
+// Routes pour Concert/Conférence/Exposition (sans date)
+Route::get('/manifestations/{type}/{id}', [ManifestationController::class, 'show'])
+    ->where('type', 'concert|conference|exposition')
+    ->name('manifestations.show');
+
+// Routes pour Atelier (avec date obligatoire pour identifier la séance)
+Route::get('/manifestations/atelier/{id}/{date}', [ManifestationController::class, 'showAtelier'])
+    ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+    ->name('manifestations.show.atelier');
 
 // Routes de réservation (nécessitent l'authentification)
 Route::middleware('auth')->group(function () {
-    // Réservations GRATUITES
-    Route::get('/manifestations/{id}/reserver', [ReservationController::class, 'create'])->name('reservations.create');
-    Route::post('/manifestations/{id}/reserver', [ReservationController::class, 'store'])->name('reservations.store');
+    // Réservations pour Concert/Conférence/Exposition
+    Route::get('/manifestations/{type}/{id}/reserver', [ReservationController::class, 'create'])
+        ->where('type', 'concert|conference|exposition')
+        ->name('reservations.create');
+    Route::post('/manifestations/{type}/{id}/reserver', [ReservationController::class, 'store'])
+        ->where('type', 'concert|conference|exposition')
+        ->name('reservations.store');
     
-    // Réservations PAYANTES
-    Route::get('/manifestations/{id}/reserver-payant', [ReservationController::class, 'createPayant'])->name('reservations.create-payant');
-    Route::post('/manifestations/{id}/reserver-payant', [ReservationController::class, 'storePayant'])->name('reservations.store-payant');
+    Route::get('/manifestations/{type}/{id}/reserver-payant', [ReservationController::class, 'createPayant'])
+        ->where('type', 'concert|conference|exposition')
+        ->name('reservations.create-payant');
+    Route::post('/manifestations/{type}/{id}/reserver-payant', [ReservationController::class, 'storePayant'])
+        ->where('type', 'concert|conference|exposition')
+        ->name('reservations.store-payant');
+    
+    // Réservations pour Atelier (avec date)
+    Route::get('/manifestations/atelier/{id}/{date}/reserver', [ReservationController::class, 'createAtelier'])
+        ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+        ->name('reservations.create.atelier');
+    Route::post('/manifestations/atelier/{id}/{date}/reserver', [ReservationController::class, 'storeAtelier'])
+        ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+        ->name('reservations.store.atelier');
+    
+    Route::get('/manifestations/atelier/{id}/{date}/reserver-payant', [ReservationController::class, 'createPayantAtelier'])
+        ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+        ->name('reservations.create-payant.atelier');
+    Route::post('/manifestations/atelier/{id}/{date}/reserver-payant', [ReservationController::class, 'storePayantAtelier'])
+        ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+        ->name('reservations.store-payant.atelier');
     
     // Voir mes réservations
     Route::get('/mes-reservations', [ReservationController::class, 'mesReservations'])->name('reservations.index');

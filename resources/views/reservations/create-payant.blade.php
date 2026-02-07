@@ -357,7 +357,11 @@
             @endif
 
             <!-- Formulaire de réservation -->
-            <form method="POST" action="{{ route('reservations.store-payant', $manifestation->idmanif) }}" id="payment-form">
+            @if(isset($type) && $type === 'atelier' && isset($date))
+                <form method="POST" action="{{ route('reservations.store-payant.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" id="payment-form">
+            @else
+                <form method="POST" action="{{ route('reservations.store-payant', ['type' => $type, 'id' => $manifestation->idmanif]) }}" id="payment-form">
+            @endif
                 @csrf
 
                 <!-- Sélection du nombre de places -->
@@ -500,9 +504,15 @@
 
                 <!-- Boutons d'action -->
                 <div class="form-actions">
-                    <a href="{{ route('manifestations.show', $manifestation->idmanif) }}" class="btn btn-secondary" style="flex: 0 0 auto;">
-                        ← Retour
-                    </a>
+                    @if(isset($type) && $type === 'atelier' && isset($date))
+                        <a href="{{ route('manifestations.show.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" class="btn btn-secondary" style="flex: 0 0 auto;">
+                            ← Retour
+                        </a>
+                    @else
+                        <a href="{{ route('manifestations.show', ['type' => $type, 'id' => $manifestation->idmanif]) }}" class="btn btn-secondary" style="flex: 0 0 auto;">
+                            ← Retour
+                        </a>
+                    @endif
                     <button type="submit" class="btn btn-primary" id="submit-btn">
                         💳 Payer <span id="submit-amount">{{ number_format($manifestation->prixmanif, 2, ',', ' ') }} €</span>
                     </button>

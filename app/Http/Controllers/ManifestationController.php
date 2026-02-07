@@ -20,12 +20,21 @@ class ManifestationController extends Controller
         ];
 
         // Récupérer les manifestations avec filtres
-        // Changement ici : getAllManifestations() devient filter()
         $manifestations = Manifestation::filter($filters);
 
         // Calculer les places restantes pour chaque manifestation
         foreach ($manifestations as $manif) {
-            $manif->places_restantes = Manifestation::getPlacesRestantes($manif->idmanif);
+            $typeSlug = Manifestation::getTypeSlugFromLabel($manif->type_manifestation);
+            $manif->type_slug = $typeSlug;
+            
+            // Pour les ateliers, ajouter le date_slug et calculer places avec la date
+            if ($typeSlug === 'atelier') {
+                $manif->date_slug = Manifestation::getDateSlug($manif->dateheure);
+                $manif->places_restantes = Manifestation::getPlacesRestantesAtelier($manif->idmanif, $manif->date_slug);
+            } else {
+                $manif->date_slug = null;
+                $manif->places_restantes = Manifestation::getPlacesRestantes($manif->idmanif, $typeSlug);
+            }
         }
 
         // Récupérer les options de filtrage
@@ -38,18 +47,19 @@ class ManifestationController extends Controller
         ]);
     }
 
-    public function show($id)
+    /**
+     * Afficher une manifestation (Concert/Conférence/Exposition)
+     */
+    public function show($type, $id)
     {
-        // Utiliser directement la vue all_manifestation
-        $manifestation = Manifestation::where('idmanif', $id)->first();
+        $manifestation = Manifestation::findByTypeAndId($type, $id);
 
         if (!$manifestation) {
             abort(404);
         }
 
-        $placesRestantes = Manifestation::getPlacesRestantes($id);
+        $placesRestantes = Manifestation::getPlacesRestantes($id, $type);
 
-        // Récupérer l'affiche si elle existe
         $affiche = DB::table('affiche')
             ->where('idtheme', $manifestation->idtheme)
             ->first();
@@ -57,7 +67,35 @@ class ManifestationController extends Controller
         return view('manifestations.show', [
             'manifestation' => $manifestation,
             'placesRestantes' => $placesRestantes,
-            'affiche' => $affiche
+            'affiche' => $affiche,
+            'type' => $type,
+            'date' => null  // Pas de date pour ces types
+        ]);
+    }
+    
+    /**
+     * Afficher un atelier (avec date pour identifier la séance)
+     */
+    public function showAtelier($id, $date)
+    {
+        $manifestation = Manifestation::findAtelierByIdAndDate($id, $date);
+
+        if (!$manifestation) {
+            abort(404, 'Séance d\'atelier introuvable');
+        }
+
+        $placesRestantes = Manifestation::getPlacesRestantesAtelier($id, $date);
+
+        $affiche = DB::table('affiche')
+            ->where('idtheme', $manifestation->idtheme)
+            ->first();
+
+        return view('manifestations.show', [
+            'manifestation' => $manifestation,
+            'placesRestantes' => $placesRestantes,
+            'affiche' => $affiche,
+            'type' => 'atelier',
+            'date' => $date  // Passer la date pour les URLs de réservation
         ]);
     }
 }
