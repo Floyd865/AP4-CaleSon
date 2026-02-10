@@ -274,6 +274,199 @@
             color: #92400e;
             margin-bottom: 15px;
         }
+        
+        /* Styles pour la section des avis */
+        .avis-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .avis-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .avis-summary {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .average-note {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .note-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .stars {
+            margin-bottom: 10px;
+        }
+        
+        .star {
+            font-size: 24px;
+            color: #d1d5db;
+        }
+        
+        .star.filled {
+            color: #f59e0b;
+        }
+        
+        .star.half {
+            color: #f59e0b;
+            opacity: 0.5;
+        }
+        
+        .total-avis {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .note-distribution {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .distribution-row {
+            display: grid;
+            grid-template-columns: 50px 1fr 40px;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .note-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #f59e0b;
+            transition: width 0.3s;
+        }
+        
+        .note-count {
+            font-size: 14px;
+            color: #666;
+            text-align: right;
+        }
+        
+        .add-avis-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .avis-list {
+            margin-top: 30px;
+        }
+        
+        .avis-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .avis-header-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        
+        .avis-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .avis-date {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        .avis-note .star {
+            font-size: 18px;
+        }
+        
+        .avis-commentaire {
+            color: #666;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+        
+        .avis-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .btn-edit, .btn-delete {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-edit {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background: #5568d3;
+        }
+        
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #dc2626;
+        }
     </style>
 </head>
 <body>
@@ -416,6 +609,115 @@
                     </div>
                 </div>
             @endauth
+        </div>
+        
+        <!-- Section des avis -->
+        <div class="avis-section">
+            <div class="avis-header">
+                <h3>⭐ Avis des spectateurs</h3>
+                @if($totalAvis > 0)
+                    <div class="avis-summary">
+                        <div class="average-note">
+                            <span class="note-number">{{ number_format($averageNote, 1) }}</span>
+                            <div class="stars">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= floor($averageNote))
+                                        <span class="star filled">★</span>
+                                    @elseif($i - 0.5 <= $averageNote)
+                                        <span class="star half">★</span>
+                                    @else
+                                        <span class="star">☆</span>
+                                    @endif
+                                @endfor
+                            </div>
+                            <span class="total-avis">{{ $totalAvis }} avis</span>
+                        </div>
+                        
+                        <div class="note-distribution">
+                            @for($i = 5; $i >= 1; $i--)
+                                @php
+                                    $count = $noteDistribution[$i] ?? 0;
+                                    $percentage = $totalAvis > 0 ? ($count / $totalAvis) * 100 : 0;
+                                @endphp
+                                <div class="distribution-row">
+                                    <span class="note-label">{{ $i }} ★</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ $percentage }}%"></div>
+                                    </div>
+                                    <span class="note-count">{{ $count }}</span>
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
+                @else
+                    <p style="color: #666; text-align: center; padding: 20px;">
+                        Aucun avis pour le moment. Soyez le premier à donner votre avis !
+                    </p>
+                @endif
+            </div>
+            
+            <!-- Bouton pour ajouter un avis -->
+            @auth
+                @if($userHasReservation && !$userHasReviewed)
+                    <div class="add-avis-section">
+                        @if($type === 'atelier' && isset($date))
+                            <a href="{{ route('avis.create.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" class="btn btn-primary">
+                                ✍️ Donner mon avis
+                            </a>
+                        @else
+                            <a href="{{ route('avis.create', ['type' => $type, 'id' => $manifestation->idmanif]) }}" class="btn btn-primary">
+                                ✍️ Donner mon avis
+                            </a>
+                        @endif
+                    </div>
+                @elseif(!$userHasReservation)
+                    <div class="alert alert-info">
+                        ℹ️ Vous devez avoir réservé cette manifestation pour pouvoir donner un avis.
+                    </div>
+                @endif
+            @endauth
+            
+            <!-- Liste des avis -->
+            @if($avis->count() > 0)
+                <div class="avis-list">
+                    @foreach($avis as $singleAvis)
+                        <div class="avis-card">
+                            <div class="avis-header-card">
+                                <div class="avis-user">
+                                    <div class="user-avatar">{{ substr($singleAvis->user_name, 0, 1) }}</div>
+                                    <div>
+                                        <strong>{{ $singleAvis->user_name }}</strong>
+                                        <div class="avis-date">{{ date('d/m/Y', strtotime($singleAvis->dateavis)) }}</div>
+                                    </div>
+                                </div>
+                                <div class="avis-note">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= $singleAvis->note)
+                                            <span class="star filled">★</span>
+                                        @else
+                                            <span class="star">☆</span>
+                                        @endif
+                                    @endfor
+                                </div>
+                            </div>
+                            @if($singleAvis->commentaire)
+                                <p class="avis-commentaire">{{ $singleAvis->commentaire }}</p>
+                            @endif
+                            
+                            @if(auth()->check() && auth()->id() == $singleAvis->idspec)
+                                <div class="avis-actions">
+                                    <a href="{{ route('avis.edit', $singleAvis->idavis) }}" class="btn-edit">Modifier</a>
+                                    <form action="{{ route('avis.destroy', $singleAvis->idavis) }}" method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet avis ?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-delete">Supprimer</button>
+                                    </form>
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
         
         <!-- Actions -->

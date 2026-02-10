@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Manifestation;
 use Illuminate\Http\Request;
+use App\Models\Avis;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ManifestationController extends Controller
 {
@@ -64,12 +66,30 @@ class ManifestationController extends Controller
             ->where('idtheme', $manifestation->idtheme)
             ->first();
 
+        // Récupérer les avis - MODIFIÉ : ajout du paramètre $type
+        $avis = Avis::getAvisForManifestation($id, $type);
+        $averageNote = Avis::getAverageNote($id, $type);
+        $totalAvis = Avis::countAvis($id, $type);
+        $noteDistribution = Avis::getNoteDistribution($id, $type);
+        
+        // Vérifier si l'utilisateur connecté a déjà donné un avis - MODIFIÉ : ajout du paramètre $type
+        $userHasReviewed = Auth::check() ? Avis::userHasReviewed($id, Auth::id(), $type) : false;
+        
+        // Vérifier si l'utilisateur a réservé
+        $userHasReservation = Auth::check() ? Avis::userHasReservation($id, Auth::id(), $type) : false;
+
         return view('manifestations.show', [
             'manifestation' => $manifestation,
             'placesRestantes' => $placesRestantes,
             'affiche' => $affiche,
             'type' => $type,
-            'date' => null  // Pas de date pour ces types
+            'date' => null,
+            'avis' => $avis,
+            'averageNote' => $averageNote,
+            'totalAvis' => $totalAvis,
+            'noteDistribution' => $noteDistribution,
+            'userHasReviewed' => $userHasReviewed,
+            'userHasReservation' => $userHasReservation
         ]);
     }
     
@@ -90,12 +110,30 @@ class ManifestationController extends Controller
             ->where('idtheme', $manifestation->idtheme)
             ->first();
 
+        // Récupérer les avis - MODIFIÉ : ajout du paramètre 'atelier'
+        $avis = Avis::getAvisForManifestation($id, 'atelier');
+        $averageNote = Avis::getAverageNote($id, 'atelier');
+        $totalAvis = Avis::countAvis($id, 'atelier');
+        $noteDistribution = Avis::getNoteDistribution($id, 'atelier');
+        
+        // Vérifier si l'utilisateur connecté a déjà donné un avis - MODIFIÉ : ajout du paramètre 'atelier'
+        $userHasReviewed = Auth::check() ? Avis::userHasReviewed($id, Auth::id(), 'atelier') : false;
+        
+        // Vérifier si l'utilisateur a réservé
+        $userHasReservation = Auth::check() ? Avis::userHasReservation($id, Auth::id(), 'atelier') : false;
+
         return view('manifestations.show', [
             'manifestation' => $manifestation,
             'placesRestantes' => $placesRestantes,
             'affiche' => $affiche,
             'type' => 'atelier',
-            'date' => $date  // Passer la date pour les URLs de réservation
+            'date' => $date,
+            'avis' => $avis,
+            'averageNote' => $averageNote,
+            'totalAvis' => $totalAvis,
+            'noteDistribution' => $noteDistribution,
+            'userHasReviewed' => $userHasReviewed,
+            'userHasReservation' => $userHasReservation
         ]);
     }
 }

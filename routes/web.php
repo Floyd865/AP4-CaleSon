@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ManifestationController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\AvisController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -68,4 +69,26 @@ Route::middleware('auth')->group(function () {
     
     // Voir mes réservations
     Route::get('/mes-reservations', [ReservationController::class, 'mesReservations'])->name('reservations.index');
+    
+    // Routes pour les avis
+    // Avis pour Concert/Conférence/Exposition
+    Route::get('/manifestations/{type}/{id}/avis/create', [AvisController::class, 'create'])
+        ->where('type', 'concert|conference|exposition')
+        ->name('avis.create');
+    Route::post('/manifestations/{type}/{id}/avis', [AvisController::class, 'store'])
+        ->where('type', 'concert|conference|exposition')
+        ->name('avis.store');
+    
+    // Avis pour Atelier
+    Route::get('/manifestations/atelier/{id}/{date}/avis/create', [AvisController::class, 'create'])
+        ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+        ->name('avis.create.atelier');
+    Route::post('/manifestations/atelier/{id}/{date}/avis', [AvisController::class, 'store'])
+        ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+        ->name('avis.store.atelier');
+    
+    // Modifier et supprimer un avis
+    Route::get('/avis/{idavis}/edit', [AvisController::class, 'edit'])->name('avis.edit');
+    Route::put('/avis/{idavis}', [AvisController::class, 'update'])->name('avis.update');
+    Route::delete('/avis/{idavis}', [AvisController::class, 'destroy'])->name('avis.destroy');
 });
