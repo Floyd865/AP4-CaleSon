@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Réservation Payante - {{ $manifestation->nommanif }}</title>
+    <title>Réservation - {{ $manifestation->nommanif }}</title>
     <style>
         * {
             margin: 0;
@@ -12,10 +12,11 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
             min-height: 100vh;
             padding: 20px;
+            color: #333;
         }
 
         .container {
@@ -23,510 +24,571 @@
             margin: 0 auto;
         }
 
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
+        .back-link {
+            display: inline-block;
+            margin-bottom: 16px;
+            color: #4a90e2;
+            text-decoration: none;
+            font-size: 14px;
         }
 
-        .header h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .header {
+            background: white;
+            padding: 28px 32px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+
+        h1 {
+            color: #1a1a1a;
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 15px;
         }
 
         .card {
             background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            padding: 28px 32px;
             margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
         }
 
-        .info-section {
-            background: #f9fafb;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
+        .manifestation-info {
+            border-left: 3px solid #ff9800;
+            padding-left: 20px;
+            margin-bottom: 28px;
         }
 
-        .info-section h2 {
+        .manifestation-info h2 {
             color: #333;
-            margin-bottom: 15px;
-            font-size: 1.4em;
+            margin-bottom: 16px;
+            font-size: 22px;
+            font-weight: 600;
         }
 
         .info-row {
             display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            font-weight: 600;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
             color: #666;
+            font-size: 14px;
         }
 
-        .info-value {
-            color: #333;
+        .info-row svg {
+            width: 18px;
+            height: 18px;
+            color: #999;
+            flex-shrink: 0;
+        }
+
+        .info-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 3px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 12px;
+            background: #fff3e0;
+            color: #e65100;
         }
 
         .alert {
-            padding: 15px;
-            border-radius: 8px;
+            padding: 14px 16px;
+            border-radius: 3px;
             margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 14px;
+            border-left: 3px solid;
         }
 
         .alert-error {
-            background: #fee;
-            color: #c00;
-            border: 1px solid #fcc;
+            background: #ffebee;
+            border-color: #f44336;
+            color: #c62828;
         }
 
         .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
+            background: #fff3e0;
+            border-color: #ff9800;
+            color: #e65100;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #1565c0;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
-        label {
+        .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
+            font-weight: 500;
             color: #333;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .form-hint {
+            font-size: 13px;
+            color: #666;
+            margin-top: 6px;
+            display: block;
         }
 
         input, select {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: 1px solid #d0d0d0;
+            border-radius: 3px;
             font-size: 14px;
-            transition: border-color 0.3s;
+            transition: border-color 0.2s;
         }
 
         input:focus, select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #4a90e2;
         }
 
-        small {
-            display: block;
-            margin-top: 5px;
-            color: #666;
+        .input-error {
+            border-color: #f44336;
+        }
+
+        .error-message {
+            color: #f44336;
             font-size: 13px;
+            margin-top: 6px;
         }
 
-        .payment-summary {
-            background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%);
-            padding: 25px;
-            border-radius: 10px;
-            margin: 25px 0;
-        }
-
-        .price-line {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .total-line {
-            font-size: 22px;
-            font-weight: 700;
-            color: #667eea;
-            border-top: 2px solid #667eea;
-            padding-top: 12px;
+        .places-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
             margin-top: 12px;
         }
 
-        .section-title {
-            font-size: 1.3em;
-            color: #333;
-            margin: 30px 0 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-preview {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 25px;
-            border-radius: 15px;
-            color: white;
-            margin-bottom: 25px;
-            min-height: 200px;
+        .place-option {
             position: relative;
-            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
         }
 
-        .card-chip {
-            width: 50px;
-            height: 40px;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            border-radius: 8px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        .place-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
         }
 
-        .card-number-display {
-            font-family: 'Courier New', monospace;
-            font-size: 22px;
-            letter-spacing: 3px;
-            margin-bottom: 20px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        .place-option label {
+            display: block;
+            padding: 16px;
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 3px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
         }
 
-        .card-details {
+        .place-option input[type="radio"]:checked + label {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }
+
+        .place-option input[type="radio"]:disabled + label {
+            background: #f5f5f5;
+            color: #bbb;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .summary {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 3px;
+            margin: 28px 0;
+            border: 1px solid #e0e0e0;
+        }
+
+        .summary h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .summary-row {
             display: flex;
             justify-content: space-between;
+            padding: 10px 0;
+            font-size: 14px;
+            color: #666;
         }
 
-        .card-detail-item {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+        .summary-row .value {
+            font-weight: 500;
+            color: #333;
         }
 
-        .card-detail-label {
-            font-size: 11px;
-            opacity: 0.8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .card-detail-value {
-            font-size: 16px;
+        .summary-row.total {
+            border-top: 2px solid #e0e0e0;
+            margin-top: 12px;
+            padding-top: 16px;
+            font-size: 18px;
             font-weight: 600;
+            color: #333;
+        }
+
+        .summary-row.total .value {
+            color: #ff9800;
+        }
+
+        .payment-section {
+            margin-top: 32px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .card-input-row {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 15px;
+            gap: 16px;
         }
 
-        .security-badge {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 15px;
+        .security-note {
             background: #f0fdf4;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #166534;
             border: 1px solid #bbf7d0;
+            border-left: 3px solid #22c55e;
+            padding: 14px 16px;
+            border-radius: 3px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #166534;
         }
 
-        .security-icon {
-            font-size: 24px;
+        .security-note strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
         }
 
         .btn {
-            padding: 14px 28px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 3px;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: background-color 0.2s;
             text-decoration: none;
             display: inline-block;
         }
 
         .btn-primary {
-            background: #667eea;
+            background: #4a90e2;
             color: white;
-            width: 100%;
+            flex: 1;
         }
 
-        .btn-primary:hover:not(:disabled) {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        .btn-primary:hover {
+            background: #357abd;
         }
 
         .btn-primary:disabled {
-            background: #d1d5db;
+            background: #e0e0e0;
+            color: #999;
             cursor: not-allowed;
         }
 
         .btn-secondary {
-            background: #e5e7eb;
-            color: #374151;
+            background: #f0f0f0;
+            color: #333;
         }
 
         .btn-secondary:hover {
-            background: #d1d5db;
-        }
-
-        .form-actions {
-            margin-top: 30px;
-            display: flex;
-            gap: 15px;
+            background: #e0e0e0;
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header, .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .places-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
             .card-input-row {
                 grid-template-columns: 1fr;
             }
 
-            .header h1 {
-                font-size: 1.5em;
+            .buttons {
+                flex-direction: column;
             }
-
-            .card-preview {
-                padding: 20px;
-                min-height: 180px;
-            }
-
-            .card-number-display {
-                font-size: 18px;
-            }
-        }
-
-        .input-error {
-            border-color: #ef4444 !important;
-        }
-
-        .error-message {
-            color: #ef4444;
-            font-size: 13px;
-            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <a href="javascript:history.back()" class="back-link">← Retour</a>
+
+        @if(session('error'))
+            <div class="alert alert-error">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert alert-error">
+                <ul style="margin: 0; padding-left: 20px;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div class="header">
-            <h1>💳 Réservation Payante</h1>
-            <p>Paiement sécurisé pour votre événement</p>
+            <h1>Réservation payante</h1>
+            <p class="subtitle">Finalisez votre réservation</p>
         </div>
 
         <div class="card">
-            <!-- Informations de la manifestation -->
-            <div class="info-section">
-                <h2>📋 {{ $manifestation->nommanif }}</h2>
+            <div class="manifestation-info">
+                <h2>{{ $manifestation->nommanif }}</h2>
+                
                 <div class="info-row">
-                    <span class="info-label">Type</span>
-                    <span class="info-value">{{ $manifestation->type_manifestation }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    <span><strong>Type :</strong> {{ $manifestation->type_manifestation }}</span>
                 </div>
+
                 <div class="info-row">
-                    <span class="info-label">Date</span>
-                    <span class="info-value">{{ date('d/m/Y à H:i', strtotime($manifestation->dateheure)) }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span><strong>Date :</strong> {{ date('d/m/Y à H:i', strtotime($manifestation->dateheure)) }}</span>
                 </div>
+
                 <div class="info-row">
-                    <span class="info-label">Lieu</span>
-                    <span class="info-value">{{ $manifestation->libellelieu }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span><strong>Lieu :</strong> {{ $manifestation->libellelieu }}</span>
                 </div>
+
                 <div class="info-row">
-                    <span class="info-label">Prix unitaire</span>
-                    <span class="info-value">{{ number_format($manifestation->prixmanif, 2, ',', ' ') }} €</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span><strong>Places restantes :</strong> {{ $placesRestantes }} / {{ $manifestation->effectif_complet }}</span>
                 </div>
-                <div class="info-row">
-                    <span class="info-label">Places restantes</span>
-                    <span class="info-value">{{ $placesRestantes }}</span>
-                </div>
+
+                <span class="info-badge">{{ number_format($manifestation->prixmanif, 2, ',', ' ') }} € / place</span>
             </div>
 
-            <!-- Alertes -->
-            @if(session('error'))
-                <div class="alert alert-error">
-                    ⚠️ {{ session('error') }}
-                </div>
-            @endif
-
             @if($placesDejaReservees > 0)
+                <div class="alert alert-info">
+                    Vous avez déjà réservé <strong>{{ $placesDejaReservees }}</strong> place(s) pour cette manifestation.
+                </div>
+            @endif
+
+            @if($maxPlacesDisponibles == 0)
                 <div class="alert alert-warning">
-                    ℹ️ Vous avez déjà réservé {{ $placesDejaReservees }} place(s) pour cette manifestation.
+                    Vous avez atteint la limite de 4 places par personne ou il n'y a plus de places disponibles.
                 </div>
-            @endif
-
-            <!-- Formulaire de réservation -->
-            @if(isset($type) && $type === 'atelier' && isset($date))
-                <form method="POST" action="{{ route('reservations.store-payant.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" id="payment-form">
             @else
-                <form method="POST" action="{{ route('reservations.store-payant', ['type' => $type, 'id' => $manifestation->idmanif]) }}" id="payment-form">
-            @endif
-                @csrf
+                @if(isset($type) && $type === 'atelier' && isset($date))
+                    <form method="POST" action="{{ route('reservations.store.atelier.payant', ['id' => $manifestation->idmanif, 'date' => $date]) }}" id="paymentForm">
+                @else
+                    <form method="POST" action="{{ route('reservations.store.payant', ['type' => $type, 'id' => $manifestation->idmanif]) }}" id="paymentForm">
+                @endif
+                    @csrf
 
-                <!-- Sélection du nombre de places -->
-                <div class="form-group">
-                    <label for="nombre_places">Nombre de places *</label>
-                    <select name="nombre_places" id="nombre_places" required onchange="updateTotal()">
-                        @for($i = 1; $i <= $maxPlacesDisponibles; $i++)
-                            <option value="{{ $i }}" {{ old('nombre_places') == $i ? 'selected' : '' }}>
-                                {{ $i }} place{{ $i > 1 ? 's' : '' }}
-                            </option>
-                        @endfor
-                    </select>
-                </div>
-
-                <!-- Récapitulatif du paiement -->
-                <div class="payment-summary">
-                    <div class="price-line">
-                        <span>Prix unitaire :</span>
-                        <span>{{ number_format($manifestation->prixmanif, 2, ',', ' ') }} €</span>
-                    </div>
-                    <div class="price-line">
-                        <span>Nombre de places :</span>
-                        <span id="nb-places-display">{{ old('nombre_places', 1) }}</span>
-                    </div>
-                    <div class="price-line total-line">
-                        <span>Total à payer :</span>
-                        <span id="total-amount">{{ number_format($manifestation->prixmanif * old('nombre_places', 1), 2, ',', ' ') }} €</span>
-                    </div>
-                </div>
-
-                <!-- Section Paiement -->
-                <h3 class="section-title">
-                    <span>💳</span>
-                    <span>Informations de paiement</span>
-                </h3>
-
-                <!-- Prévisualisation de la carte -->
-                <div class="card-preview">
-                    <div class="card-chip"></div>
-                    <div class="card-number-display" id="card-display">•••• •••• •••• ••••</div>
-                    <div class="card-details">
-                        <div class="card-detail-item">
-                            <div class="card-detail-label">Titulaire</div>
-                            <div class="card-detail-value" id="name-display">VOTRE NOM</div>
-                        </div>
-                        <div class="card-detail-item">
-                            <div class="card-detail-label">Expire</div>
-                            <div class="card-detail-value" id="expiry-display">MM/AA</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Numéro de carte -->
-                <div class="form-group">
-                    <label for="card_number">Numéro de carte bancaire *</label>
-                    <input 
-                        type="text" 
-                        name="card_number" 
-                        id="card_number" 
-                        placeholder="1234567890123456" 
-                        maxlength="16"
-                        pattern="[0-9]{16}"
-                        value="{{ old('card_number') }}"
-                        required
-                        oninput="formatCardNumber(this); updateCardDisplay()"
-                    >
-                    <small>16 chiffres sans espaces (ex: 4111111111111111 pour test)</small>
-                    @error('card_number')
-                        <div class="error-message">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Nom sur la carte -->
-                <div class="form-group">
-                    <label for="card_name">Nom du titulaire *</label>
-                    <input 
-                        type="text" 
-                        name="card_name" 
-                        id="card_name" 
-                        placeholder="JEAN DUPONT" 
-                        value="{{ old('card_name') }}"
-                        required
-                        style="text-transform: uppercase"
-                        oninput="updateCardDisplay()"
-                    >
-                    <small>Nom tel qu'il apparaît sur la carte</small>
-                    @error('card_name')
-                        <div class="error-message">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Date d'expiration et CVV -->
-                <div class="card-input-row">
-                    <div class="form-group">
-                        <label for="card_expiry">Date d'expiration *</label>
-                        <input 
-                            type="text" 
-                            name="card_expiry" 
-                            id="card_expiry" 
-                            placeholder="MM/AA" 
-                            maxlength="5"
-                            pattern="(0[1-9]|1[0-2])\/[0-9]{2}"
-                            value="{{ old('card_expiry') }}"
-                            required
-                            oninput="formatExpiry(this); updateCardDisplay()"
-                        >
-                        <small>Format : MM/AA (ex: 12/28)</small>
-                        @error('card_expiry')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label for="card_cvv">CVV *</label>
-                        <input 
-                            type="text" 
-                            name="card_cvv" 
-                            id="card_cvv" 
-                            placeholder="123" 
-                            maxlength="3"
-                            pattern="[0-9]{3}"
-                            value="{{ old('card_cvv') }}"
-                            required
-                        >
-                        <small>3 chiffres au dos</small>
-                        @error('card_cvv')
-                            <div class="error-message">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- Badge de sécurité -->
-                <div class="security-badge">
-                    <span class="security-icon">🔒</span>
-                    <div>
-                        <strong>Paiement 100% sécurisé</strong><br>
-                        <small>Vos données bancaires sont cryptées et protégées</small>
-                    </div>
-                </div>
-
-                <!-- Boutons d'action -->
-                <div class="form-actions">
                     @if(isset($type) && $type === 'atelier' && isset($date))
-                        <a href="{{ route('manifestations.show.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" class="btn btn-secondary" style="flex: 0 0 auto;">
-                            ← Retour
-                        </a>
-                    @else
-                        <a href="{{ route('manifestations.show', ['type' => $type, 'id' => $manifestation->idmanif]) }}" class="btn btn-secondary" style="flex: 0 0 auto;">
-                            ← Retour
-                        </a>
+                        <input type="hidden" name="date" value="{{ $date }}">
                     @endif
-                    <button type="submit" class="btn btn-primary" id="submit-btn">
-                        💳 Payer <span id="submit-amount">{{ number_format($manifestation->prixmanif, 2, ',', ' ') }} €</span>
-                    </button>
-                </div>
-            </form>
+
+                    <div class="form-group">
+                        <label for="nombre_places">Nombre de places</label>
+                        <span class="form-hint">Maximum {{ $maxPlacesDisponibles }} place(s) disponible(s)</span>
+                        
+                        <div class="places-selector">
+                            @for($i = 1; $i <= min(4, $maxPlacesDisponibles); $i++)
+                                <div class="place-option">
+                                    <input 
+                                        type="radio" 
+                                        name="nombre_places" 
+                                        id="places_{{ $i }}" 
+                                        value="{{ $i }}"
+                                        {{ old('nombre_places', 1) == $i ? 'checked' : '' }}
+                                        {{ $i > $maxPlacesDisponibles ? 'disabled' : '' }}
+                                        onchange="updateTotal()"
+                                    >
+                                    <label for="places_{{ $i }}">
+                                        {{ $i }} place{{ $i > 1 ? 's' : '' }}
+                                    </label>
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
+
+                    <div class="summary">
+                        <h3>Récapitulatif</h3>
+                        <div class="summary-row">
+                            <span class="label">Prix unitaire :</span>
+                            <span class="value">{{ number_format($manifestation->prixmanif, 2, ',', ' ') }} €</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="label">Nombre de places :</span>
+                            <span class="value" id="nb-places-display">1</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span class="label">Total à payer :</span>
+                            <span class="value" id="total-amount">{{ number_format($manifestation->prixmanif, 2, ',', ' ') }} €</span>
+                        </div>
+                    </div>
+
+                    <div class="payment-section">
+                        <div class="section-title">Informations de paiement</div>
+
+                        <div class="form-group">
+                            <label for="card_number">Numéro de carte bancaire *</label>
+                            <input 
+                                type="text" 
+                                name="card_number" 
+                                id="card_number" 
+                                placeholder="1234 5678 9012 3456" 
+                                maxlength="19"
+                                value="{{ old('card_number') }}"
+                                required
+                                oninput="formatCardNumber(this)"
+                            >
+                            <span class="form-hint">16 chiffres (utilisez 4111111111111111 pour test)</span>
+                            @error('card_number')
+                                <div class="error-message">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="card_name">Nom du titulaire *</label>
+                            <input 
+                                type="text" 
+                                name="card_name" 
+                                id="card_name" 
+                                placeholder="Jean Dupont" 
+                                value="{{ old('card_name') }}"
+                                required
+                                style="text-transform: uppercase"
+                            >
+                            <span class="form-hint">Tel qu'il apparaît sur la carte</span>
+                            @error('card_name')
+                                <div class="error-message">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="card-input-row">
+                            <div class="form-group">
+                                <label for="card_expiry">Date d'expiration *</label>
+                                <input 
+                                    type="text" 
+                                    name="card_expiry" 
+                                    id="card_expiry" 
+                                    placeholder="MM/AA" 
+                                    maxlength="5"
+                                    value="{{ old('card_expiry') }}"
+                                    required
+                                    oninput="formatExpiry(this)"
+                                >
+                                <span class="form-hint">Format : MM/AA</span>
+                                @error('card_expiry')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group">
+                                <label for="card_cvv">CVV *</label>
+                                <input 
+                                    type="text" 
+                                    name="card_cvv" 
+                                    id="card_cvv" 
+                                    placeholder="123" 
+                                    maxlength="3"
+                                    value="{{ old('card_cvv') }}"
+                                    required
+                                    oninput="this.value = this.value.replace(/\D/g, '')"
+                                >
+                                <span class="form-hint">3 chiffres au dos</span>
+                                @error('card_cvv')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="security-note">
+                            <strong>Paiement sécurisé</strong>
+                            Vos informations bancaires sont cryptées et protégées.
+                        </div>
+                    </div>
+
+                    <div class="buttons">
+                        @if(isset($type) && $type === 'atelier' && isset($date))
+                            <a href="{{ route('manifestations.show.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" class="btn btn-secondary">
+                                Annuler
+                            </a>
+                        @else
+                            <a href="{{ route('manifestations.show', ['type' => $type, 'id' => $manifestation->idmanif]) }}" class="btn btn-secondary">
+                                Annuler
+                            </a>
+                        @endif
+                        <button type="submit" class="btn btn-primary" id="submit-btn">
+                            Payer <span id="submit-amount">{{ number_format($manifestation->prixmanif, 2, ',', ' ') }} €</span>
+                        </button>
+                    </div>
+                </form>
+            @endif
         </div>
     </div>
 
     <script>
         const prixUnitaire = {{ $manifestation->prixmanif }};
 
-        // Mettre à jour le total à payer
         function updateTotal() {
-            const nbPlaces = parseInt(document.getElementById('nombre_places').value);
+            const nbPlaces = parseInt(document.querySelector('input[name="nombre_places"]:checked').value);
             const total = prixUnitaire * nbPlaces;
             
             document.getElementById('nb-places-display').textContent = nbPlaces;
@@ -534,66 +596,35 @@
             document.getElementById('submit-amount').textContent = total.toFixed(2).replace('.', ',') + ' €';
         }
 
-        // Formater le numéro de carte (garder uniquement les chiffres)
         function formatCardNumber(input) {
             let value = input.value.replace(/\D/g, '');
-            input.value = value;
+            let formatted = '';
+            
+            for (let i = 0; i < value.length && i < 16; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formatted += ' ';
+                }
+                formatted += value[i];
+            }
+            
+            input.value = formatted;
         }
 
-        // Formater la date d'expiration (MM/AA)
         function formatExpiry(input) {
             let value = input.value.replace(/\D/g, '');
+            
             if (value.length >= 2) {
                 value = value.substring(0, 2) + '/' + value.substring(2, 4);
             }
+            
             input.value = value;
         }
 
-        // Mettre à jour l'affichage de la carte
-        function updateCardDisplay() {
-            const cardNumber = document.getElementById('card_number').value;
-            const cardName = document.getElementById('card_name').value;
-            const cardExpiry = document.getElementById('card_expiry').value;
-
-            // Afficher le numéro de carte masqué
-            if (cardNumber.length > 0) {
-                let displayed = '';
-                for (let i = 0; i < cardNumber.length; i += 4) {
-                    if (i > 0) displayed += ' ';
-                    displayed += cardNumber.substring(i, i + 4);
-                }
-                // Compléter avec des points
-                while (displayed.replace(/ /g, '').length < 16) {
-                    if (displayed.length % 5 === 4) displayed += ' ';
-                    displayed += '•';
-                }
-                document.getElementById('card-display').textContent = displayed;
-            } else {
-                document.getElementById('card-display').textContent = '•••• •••• •••• ••••';
-            }
-
-            // Afficher le nom
-            document.getElementById('name-display').textContent = cardName || 'VOTRE NOM';
-
-            // Afficher la date d'expiration
-            document.getElementById('expiry-display').textContent = cardExpiry || 'MM/AA';
-        }
-
-        // Validation avant soumission
-        document.getElementById('payment-form').addEventListener('submit', function(e) {
-            const cardNumber = document.getElementById('card_number').value;
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            const cardNumber = document.getElementById('card_number').value.replace(/\s/g, '');
             const cvv = document.getElementById('card_cvv').value;
             const expiry = document.getElementById('card_expiry').value;
 
-            // Vérifier le numéro de carte
-            if (cardNumber.length !== 16 || !/^[0-9]{16}$/.test(cardNumber)) {
-                e.preventDefault();
-                alert('Le numéro de carte doit contenir exactement 16 chiffres');
-                document.getElementById('card_number').classList.add('input-error');
-                return false;
-            }
-
-            // Vérifier le CVV
             if (cvv.length !== 3 || !/^[0-9]{3}$/.test(cvv)) {
                 e.preventDefault();
                 alert('Le CVV doit contenir exactement 3 chiffres');
@@ -601,7 +632,6 @@
                 return false;
             }
 
-            // Vérifier la date d'expiration
             if (!/^(0[1-9]|1[0-2])\/[0-9]{2}$/.test(expiry)) {
                 e.preventDefault();
                 alert('La date d\'expiration doit être au format MM/AA');
@@ -609,7 +639,6 @@
                 return false;
             }
 
-            // Vérifier que la carte n'est pas expirée
             const [month, year] = expiry.split('/');
             const expiryDate = new Date(2000 + parseInt(year), parseInt(month) - 1);
             const today = new Date();
@@ -621,13 +650,11 @@
                 return false;
             }
 
-            // Désactiver le bouton pour éviter les doubles soumissions
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Traitement en cours...';
+            submitBtn.textContent = 'Traitement en cours...';
         });
 
-        // Retirer les erreurs lors de la saisie
         document.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', function() {
                 this.classList.remove('input-error');

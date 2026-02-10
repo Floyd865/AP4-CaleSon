@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 
 class ManifestationController extends Controller
 {
+    /**
+     * Afficher la liste des manifestations (accessible à tous)
+     */
     public function index(Request $request)
     {
         // Récupérer les filtres de la requête
@@ -42,11 +45,21 @@ class ManifestationController extends Controller
         // Récupérer les options de filtrage
         $filterOptions = Manifestation::getFilterOptions();
 
-        return view('manifestations.index', [
-            'manifestations' => $manifestations,
-            'filterOptions' => $filterOptions,
-            'filters' => $filters
-        ]);
+        // Si l'utilisateur est connecté, utiliser le layout app
+        // Sinon, utiliser la page welcome (pour les visiteurs)
+        if (Auth::check()) {
+            return view('manifestations.index', [
+                'manifestations' => $manifestations,
+                'filterOptions' => $filterOptions,
+                'filters' => $filters
+            ]);
+        } else {
+            return view('welcome', [
+                'manifestations' => $manifestations,
+                'filterOptions' => $filterOptions,
+                'filters' => $filters
+            ]);
+        }
     }
 
     /**
@@ -66,13 +79,13 @@ class ManifestationController extends Controller
             ->where('idtheme', $manifestation->idtheme)
             ->first();
 
-        // Récupérer les avis - MODIFIÉ : ajout du paramètre $type
+        // Récupérer les avis
         $avis = Avis::getAvisForManifestation($id, $type);
         $averageNote = Avis::getAverageNote($id, $type);
         $totalAvis = Avis::countAvis($id, $type);
         $noteDistribution = Avis::getNoteDistribution($id, $type);
         
-        // Vérifier si l'utilisateur connecté a déjà donné un avis - MODIFIÉ : ajout du paramètre $type
+        // Vérifier si l'utilisateur connecté a déjà donné un avis
         $userHasReviewed = Auth::check() ? Avis::userHasReviewed($id, Auth::id(), $type) : false;
         
         // Vérifier si l'utilisateur a réservé
@@ -110,13 +123,13 @@ class ManifestationController extends Controller
             ->where('idtheme', $manifestation->idtheme)
             ->first();
 
-        // Récupérer les avis - MODIFIÉ : ajout du paramètre 'atelier'
+        // Récupérer les avis
         $avis = Avis::getAvisForManifestation($id, 'atelier');
         $averageNote = Avis::getAverageNote($id, 'atelier');
         $totalAvis = Avis::countAvis($id, 'atelier');
         $noteDistribution = Avis::getNoteDistribution($id, 'atelier');
         
-        // Vérifier si l'utilisateur connecté a déjà donné un avis - MODIFIÉ : ajout du paramètre 'atelier'
+        // Vérifier si l'utilisateur connecté a déjà donné un avis
         $userHasReviewed = Auth::check() ? Avis::userHasReviewed($id, Auth::id(), 'atelier') : false;
         
         // Vérifier si l'utilisateur a réservé

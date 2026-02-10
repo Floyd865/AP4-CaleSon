@@ -12,10 +12,11 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
             min-height: 100vh;
             padding: 20px;
+            color: #333;
         }
 
         .container {
@@ -23,70 +24,91 @@
             margin: 0 auto;
         }
 
-        h1 {
-            color: white;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .actions-header {
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            background: white;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+
+        h1 {
+            color: #1a1a1a;
+            font-size: 28px;
+            font-weight: 600;
         }
 
         .btn {
             display: inline-block;
-            padding: 12px 24px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 3px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             text-decoration: none;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: background-color 0.2s;
         }
 
         .btn-primary {
-            background: white;
-            color: #667eea;
+            background: #4a90e2;
+            color: white;
         }
 
         .btn-primary:hover {
-            background: #f0f0f0;
-            transform: translateY(-2px);
+            background: #357abd;
+        }
+
+        .alert {
+            padding: 14px 16px;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border-left: 3px solid;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #1565c0;
         }
 
         .reservation-card {
             background: white;
-            border-radius: 10px;
-            padding: 25px;
+            border-radius: 4px;
+            padding: 28px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #e0e0e0;
+            transition: box-shadow 0.2s;
         }
 
         .reservation-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: start;
+            align-items: flex-start;
             margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .card-title {
-            font-size: 1.8em;
-            color: #333;
-            margin-bottom: 5px;
+            font-size: 22px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .badges {
@@ -97,35 +119,42 @@
         }
 
         .badge {
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 5px 12px;
+            border-radius: 3px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .badge-type {
-            background: #667eea;
-            color: white;
+            background: #f0f0f0;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .badge-price {
-            background: #f59e0b;
-            color: white;
+            font-weight: 600;
         }
 
         .badge-price.free {
-            background: #10b981;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-price.paid {
+            background: #fff3e0;
+            color: #e65100;
         }
 
         .badge-tickets {
-            background: #8b5cf6;
-            color: white;
+            background: #e3f2fd;
+            color: #1565c0;
         }
 
         .card-info {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
+            gap: 16px;
             margin-bottom: 20px;
         }
 
@@ -134,12 +163,14 @@
             align-items: center;
             gap: 10px;
             color: #666;
+            font-size: 14px;
         }
 
         .info-item svg {
             width: 18px;
             height: 18px;
-            color: #667eea;
+            color: #999;
+            flex-shrink: 0;
         }
 
         .info-item strong {
@@ -147,36 +178,48 @@
         }
 
         .billets-section {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 3px;
+            margin-top: 16px;
         }
 
         .billets-section h4 {
-            color: #667eea;
-            margin-bottom: 10px;
+            color: #333;
+            margin-bottom: 12px;
             font-size: 14px;
+            font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .billet-item {
             background: white;
-            padding: 10px 15px;
+            padding: 12px 16px;
             margin-bottom: 8px;
-            border-radius: 5px;
+            border-radius: 3px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 3px solid #667eea;
+            border-left: 3px solid #4a90e2;
         }
 
         .billet-item:last-child {
             margin-bottom: 0;
         }
 
+        .billet-item strong {
+            color: #333;
+            font-size: 14px;
+        }
+
+        .billet-item small {
+            color: #999;
+            font-size: 13px;
+        }
+
         .qr-code {
-            font-family: monospace;
+            font-family: 'Courier New', monospace;
             font-size: 11px;
             color: #666;
             background: #f0f0f0;
@@ -187,54 +230,61 @@
         .no-reservations {
             background: white;
             padding: 60px 40px;
-            border-radius: 10px;
+            border-radius: 4px;
             text-align: center;
+            border: 1px solid #e0e0e0;
         }
 
         .no-reservations svg {
-            width: 80px;
-            height: 80px;
-            color: #d1d5db;
+            width: 64px;
+            height: 64px;
+            color: #ccc;
             margin-bottom: 20px;
         }
 
         .no-reservations h2 {
             color: #333;
             margin-bottom: 10px;
+            font-size: 20px;
+            font-weight: 600;
         }
 
         .no-reservations p {
             color: #666;
-            margin-bottom: 25px;
+            margin-bottom: 24px;
         }
 
-        .alert {
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
 
-        .alert-success {
-            background: #d1fae5;
-            border-left: 4px solid #10b981;
-            color: #065f46;
-        }
+            h1 {
+                font-size: 24px;
+            }
 
-        .alert-info {
-            background: #dbeafe;
-            border-left: 4px solid #3b82f6;
-            color: #1e40af;
+            .card-header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .badges {
+                align-items: flex-start;
+                flex-direction: row;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="actions-header">
-            <h1>🎫 Mes Réservations</h1>
+        <header>
+            <h1>Mes Réservations</h1>
             <a href="{{ route('manifestations.index') }}" class="btn btn-primary">
-                ← Retour aux manifestations
+                Retour aux manifestations
             </a>
-        </div>
+        </header>
 
         @if(session('success'))
             <div class="alert alert-success">
@@ -244,7 +294,7 @@
 
         @if($reservations->count() > 0)
             <div class="alert alert-info">
-                ℹ️ Vous avez {{ $reservations->count() }} réservation(s) en cours
+                Vous avez {{ $reservations->count() }} réservation(s) en cours
             </div>
 
             @foreach($reservations as $nomManif => $reservation)
@@ -258,7 +308,7 @@
                             @if(is_null($reservation['manifestation']->prixmanif))
                                 <span class="badge badge-price free">Gratuit</span>
                             @else
-                                <span class="badge badge-price">{{ number_format($reservation['manifestation']->prixmanif, 2, ',', ' ') }} €</span>
+                                <span class="badge badge-price paid">{{ number_format($reservation['manifestation']->prixmanif, 2, ',', ' ') }} €</span>
                             @endif
                             <span class="badge badge-tickets">{{ $reservation['nombre_billets'] }} billet(s)</span>
                         </div>
@@ -288,13 +338,13 @@
                     </div>
 
                     <div class="billets-section">
-                        <h4>📋 Vos billets</h4>
+                        <h4>Vos billets</h4>
                         @foreach($reservation['billets'] as $billet)
                             <div class="billet-item">
                                 <div>
                                     <strong>Billet #{{ $loop->iteration }}</strong>
                                     <br>
-                                    <small style="color: #666;">Réservé le {{ date('d/m/Y', strtotime($billet->datereserv)) }}</small>
+                                    <small>Réservé le {{ date('d/m/Y', strtotime($billet->datereserv)) }}</small>
                                 </div>
                                 <span class="qr-code">QR: {{ substr($billet->qr_code, 0, 20) }}...</span>
                             </div>
@@ -310,7 +360,7 @@
                 </svg>
                 <h2>Aucune réservation</h2>
                 <p>Vous n'avez pas encore réservé de places pour les manifestations.</p>
-                <a href="{{ route('manifestations.index') }}" class="btn btn-primary" style="background: #667eea; color: white;">
+                <a href="{{ route('manifestations.index') }}" class="btn btn-primary">
                     Découvrir les manifestations
                 </a>
             </div>

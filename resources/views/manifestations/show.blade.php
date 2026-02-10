@@ -12,536 +12,595 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
             min-height: 100vh;
             padding: 20px;
+            color: #333;
         }
         
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background-color: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 16px;
+            color: #4a90e2;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
         }
         
         .header {
+            background: white;
+            padding: 32px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .header-top {
             display: flex;
             justify-content: space-between;
-            align-items: start;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #667eea;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
         }
         
         h1 {
-            color: #333;
-            font-size: 2em;
+            color: #1a1a1a;
+            font-size: 32px;
+            font-weight: 600;
             flex: 1;
+            line-height: 1.2;
         }
         
+        .badges {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
         .badge {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-left: 15px;
+            padding: 6px 12px;
+            border-radius: 3px;
+            font-size: 13px;
+            font-weight: 500;
         }
         
         .badge-type {
-            background: #667eea;
-            color: white;
+            background: #f0f0f0;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
         
         .badge-price {
-            background: #f59e0b;
-            color: white;
+            font-weight: 600;
         }
-        
+
         .badge-price.free {
-            background: #10b981;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-price.paid {
+            background: #fff3e0;
+            color: #e65100;
         }
         
         .info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 16px;
         }
         
-        .info-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            font-size: 15px;
         }
-        
-        .info-card h3 {
-            color: #667eea;
-            font-size: 14px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
+
+        .info-item svg {
+            width: 18px;
+            height: 18px;
+            color: #999;
+            flex-shrink: 0;
         }
-        
-        .info-card p {
+
+        .info-item strong {
             color: #333;
-            font-size: 16px;
+        }
+        
+        .section {
+            background: white;
+            padding: 24px 32px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .section h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 12px;
             font-weight: 600;
         }
         
-        .description {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-        
-        .description h3 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        
-        .description p {
+        .section p {
             color: #666;
-            line-height: 1.8;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .affiche-info {
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 3px;
+            border-left: 3px solid #4a90e2;
+        }
+
+        .affiche-info p {
+            margin-bottom: 8px;
+        }
+
+        .affiche-info p:last-child {
+            margin-bottom: 0;
         }
         
-        .affiche-section {
-            margin-bottom: 30px;
-        }
-        
-        .affiche-section h3 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        
-        .places-info {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .places-info h3 {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        
-        .places-info .places-number {
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .places-info.warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        }
-        
-        .places-info.danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        }
-        
-        .reservation-section {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-        
-        .reservation-section h3 {
-            color: #667eea;
+        .places-banner {
+            background: white;
+            color: #1a1a1a;
+            padding: 24px 32px;
+            border-radius: 4px;
             margin-bottom: 20px;
-            font-size: 20px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .places-banner h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .places-banner .places-number {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #4caf50;
+        }
+
+        .places-banner.warning .places-number {
+            color: #ff9800;
+        }
+
+        .places-banner.danger .places-number {
+            color: #f44336;
+        }
+
+        .places-banner p {
+            color: #666;
+            font-size: 14px;
         }
         
         .alert {
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            padding: 14px 16px;
+            border-radius: 3px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            border-left: 3px solid;
         }
         
         .alert-success {
-            background: #d1fae5;
-            border-left: 4px solid #10b981;
-            color: #065f46;
+            background: #e8f5e9;
+            border-color: #4caf50;
+            color: #2e7d32;
         }
         
         .alert-error {
-            background: #fee2e2;
-            border-left: 4px solid #ef4444;
-            color: #991b1b;
+            background: #ffebee;
+            border-color: #f44336;
+            color: #c62828;
         }
         
         .alert-warning {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            color: #92400e;
+            background: #fff3e0;
+            border-color: #ff9800;
+            color: #e65100;
         }
         
         .alert-info {
-            background: #dbeafe;
-            border-left: 4px solid #3b82f6;
-            color: #1e40af;
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #1565c0;
         }
         
         .btn {
             display: inline-block;
-            padding: 12px 30px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 3px;
+            font-size: 15px;
+            font-weight: 500;
             text-decoration: none;
             cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
+            transition: background-color 0.2s;
         }
         
         .btn-primary {
-            background: #667eea;
+            background: #4a90e2;
             color: white;
         }
         
         .btn-primary:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            background: #357abd;
         }
         
         .btn-success {
-            background: #10b981;
+            background: #4caf50;
             color: white;
         }
         
         .btn-success:hover {
-            background: #059669;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+            background: #388e3c;
         }
-        
+
         .btn-warning {
-            background: #f59e0b;
+            background: #ff9800;
             color: white;
         }
-        
+
         .btn-warning:hover {
-            background: #d97706;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+            background: #f57c00;
         }
         
         .btn-secondary {
-            background: #6c757d;
-            color: white;
+            background: #f0f0f0;
+            color: #333;
         }
         
         .btn-secondary:hover {
-            background: #5a6268;
+            background: #e0e0e0;
         }
         
         .btn-disabled {
-            background: #e5e7eb;
-            color: #9ca3af;
+            background: #e0e0e0;
+            color: #999;
             cursor: not-allowed;
         }
-        
-        .btn-disabled:hover {
-            background: #e5e7eb;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-        
+
         .login-prompt {
-            background: #fef3c7;
-            border: 2px solid #f59e0b;
-            padding: 20px;
-            border-radius: 8px;
             text-align: center;
+            padding: 20px 0;
         }
-        
+
         .login-prompt p {
-            color: #92400e;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
+            color: #666;
         }
-        
-        /* Styles pour la section des avis */
+
+        .login-prompt .btn {
+            margin: 0 6px;
+        }
+
         .avis-section {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-        
-        .avis-section h3 {
-            color: #667eea;
+            background: white;
+            padding: 32px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
             margin-bottom: 20px;
-            font-size: 20px;
         }
-        
+
+        .avis-header {
+            margin-bottom: 24px;
+        }
+
+        .avis-header h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
         .avis-summary {
             display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
+            grid-template-columns: 180px 1fr;
+            gap: 32px;
+            padding: 24px;
+            background: #f9f9f9;
+            border-radius: 3px;
         }
-        
+
         .average-note {
             text-align: center;
-            padding: 20px;
         }
-        
+
         .note-number {
             font-size: 48px;
-            font-weight: bold;
-            color: #667eea;
+            font-weight: 700;
+            color: #333;
+            line-height: 1;
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
-        
+
         .stars {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
-        
+
         .star {
-            font-size: 24px;
-            color: #d1d5db;
+            color: #ffa726;
+            font-size: 20px;
         }
-        
+
         .star.filled {
-            color: #f59e0b;
+            color: #ff9800;
         }
-        
-        .star.half {
-            color: #f59e0b;
-            opacity: 0.5;
-        }
-        
+
         .total-avis {
+            font-size: 13px;
             color: #666;
-            font-size: 14px;
         }
-        
+
         .note-distribution {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
-        
+
         .distribution-row {
-            display: grid;
-            grid-template-columns: 50px 1fr 40px;
+            display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
-        
+
         .note-label {
-            font-size: 14px;
+            font-size: 13px;
             color: #666;
-            font-weight: 600;
+            width: 40px;
         }
-        
+
         .progress-bar {
+            flex: 1;
             height: 8px;
-            background: #e5e7eb;
+            background: #e0e0e0;
             border-radius: 4px;
             overflow: hidden;
         }
-        
+
         .progress-fill {
             height: 100%;
-            background: #f59e0b;
-            transition: width 0.3s;
+            background: #ff9800;
+            border-radius: 4px;
         }
-        
+
         .note-count {
-            font-size: 14px;
+            font-size: 13px;
             color: #666;
+            width: 30px;
             text-align: right;
         }
-        
+
         .add-avis-section {
-            text-align: center;
             margin: 20px 0;
         }
-        
+
         .avis-list {
-            margin-top: 30px;
+            margin-top: 24px;
         }
-        
+
         .avis-card {
-            background: white;
             padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border-left: 4px solid #667eea;
+            border: 1px solid #e0e0e0;
+            border-radius: 3px;
+            margin-bottom: 16px;
+            background: #fafafa;
         }
-        
+
+        .avis-card:last-child {
+            margin-bottom: 0;
+        }
+
         .avis-header-card {
             display: flex;
             justify-content: space-between;
-            align-items: start;
-            margin-bottom: 15px;
+            align-items: flex-start;
+            margin-bottom: 12px;
         }
-        
+
         .avis-user {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
-        
+
         .user-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #4a90e2;
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 18px;
+            font-weight: 600;
+            font-size: 16px;
         }
-        
+
+        .avis-user strong {
+            display: block;
+            color: #333;
+            font-size: 15px;
+        }
+
         .avis-date {
-            font-size: 12px;
+            font-size: 13px;
             color: #999;
-            margin-top: 2px;
         }
-        
-        .avis-note .star {
-            font-size: 18px;
+
+        .avis-note {
+            display: flex;
+            gap: 2px;
         }
-        
+
         .avis-commentaire {
             color: #666;
             line-height: 1.6;
-            margin: 15px 0;
+            font-size: 14px;
         }
-        
+
         .avis-actions {
+            margin-top: 12px;
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
+            gap: 12px;
         }
-        
+
         .btn-edit, .btn-delete {
-            padding: 6px 12px;
+            padding: 6px 14px;
             border: none;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
+            border-radius: 3px;
+            font-size: 13px;
             cursor: pointer;
-            transition: all 0.3s;
+            font-weight: 500;
         }
-        
+
         .btn-edit {
-            background: #667eea;
-            color: white;
+            background: #f0f0f0;
+            color: #333;
         }
-        
+
         .btn-edit:hover {
-            background: #5568d3;
+            background: #e0e0e0;
         }
-        
+
         .btn-delete {
-            background: #ef4444;
-            color: white;
+            background: #ffebee;
+            color: #d32f2f;
         }
-        
+
         .btn-delete:hover {
-            background: #dc2626;
+            background: #ffcdd2;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header, .section, .avis-section {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .header-top {
+                flex-direction: column;
+            }
+
+            .badges {
+                align-items: flex-start;
+                flex-direction: row;
+            }
+
+            .avis-summary {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Messages flash -->
+        <a href="{{ route('manifestations.index') }}" class="back-link">← Retour à la liste</a>
+
         @if(session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
             </div>
         @endif
-        
+
         @if(session('error'))
             <div class="alert alert-error">
                 {{ session('error') }}
             </div>
         @endif
         
-        <!-- En-tête -->
         <div class="header">
-            <h1>{{ $manifestation->nommanif }}</h1>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <span class="badge badge-type">{{ $manifestation->type_manifestation }}</span>
-                @if(is_null($manifestation->prixmanif))
-                    <span class="badge badge-price free">Gratuit</span>
-                @else
-                    <span class="badge badge-price">{{ number_format($manifestation->prixmanif, 2, ',', ' ') }} €</span>
-                @endif
+            <div class="header-top">
+                <h1>{{ $manifestation->nommanif }}</h1>
+                <div class="badges">
+                    <span class="badge badge-type">{{ $manifestation->type_manifestation }}</span>
+                    @if(is_null($manifestation->prixmanif))
+                        <span class="badge badge-price free">Gratuit</span>
+                    @else
+                        <span class="badge badge-price paid">{{ number_format($manifestation->prixmanif, 2, ',', ' ') }} €</span>
+                    @endif
+                </div>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>{{ date('d/m/Y à H:i', strtotime($manifestation->dateheure)) }}</span>
+                </div>
+
+                <div class="info-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span>{{ $manifestation->libellelieu }}</span>
+                </div>
+
+                <div class="info-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <span>{{ $manifestation->libellecom }}</span>
+                </div>
             </div>
         </div>
         
-        <!-- Informations principales -->
-        <div class="info-grid">
-            <div class="info-card">
-                <h3>📅 Date et heure</h3>
-                <p>{{ date('d/m/Y à H:i', strtotime($manifestation->dateheure)) }}</p>
-            </div>
-            
-            <div class="info-card">
-                <h3>📍 Lieu</h3>
-                <p>{{ $manifestation->libellelieu }}</p>
-            </div>
-            
-            <div class="info-card">
-                <h3>👥 Public visé</h3>
-                <p>{{ $manifestation->libellecom }}</p>
-            </div>
-            
-            <div class="info-card">
-                <h3>⏱️ Durée</h3>
-                <p>{{ $manifestation->duree }} minutes</p>
-            </div>
-        </div>
-        
-        <!-- Description -->
         @if($manifestation->resumemanif)
-        <div class="description">
-            <h3>📝 Description</h3>
+        <div class="section">
+            <h2>Description</h2>
             <p>{{ $manifestation->resumemanif }}</p>
         </div>
         @endif
         
-        <!-- Affiche -->
         @if($affiche)
-        <div class="affiche-section">
-            <h3>🎨 Affiche</h3>
-            <div class="info-card">
-                <p><strong>Nom :</strong> {{ $affiche->nomAffiche }}</p>
+        <div class="section">
+            <h2>Affiche</h2>
+            <div class="affiche-info">
+                <p><strong>{{ $affiche->nomAffiche }}</strong></p>
                 @if(isset($affiche->description))
-                    <p style="margin-top: 10px; color: #666;">{{ $affiche->description }}</p>
+                    <p style="margin-top: 8px; color: #666;">{{ $affiche->description }}</p>
                 @endif
             </div>
         </div>
         @endif
         
-        <!-- Places restantes -->
         @php
             $placesClass = '';
             if ($placesRestantes == 0) {
@@ -551,70 +610,64 @@
             }
         @endphp
         
-        <div class="places-info {{ $placesClass }}">
+        <div class="places-banner {{ $placesClass }}">
             <h3>Places disponibles</h3>
             <div class="places-number">{{ $placesRestantes }}</div>
             <p>sur {{ $manifestation->effectif_complet }} places au total</p>
         </div>
         
-        <!-- Section de réservation -->
-        <div class="reservation-section">
-            <h3>🎫 Réserver cette manifestation</h3>
+        <div class="section">
+            <h2>Réservation</h2>
             
             @auth
                 @if($placesRestantes > 0)
                     @if(is_null($manifestation->prixmanif) || $manifestation->prixmanif == 0)
-                        <!-- Réservation gratuite -->
                         <div class="alert alert-info">
-                            ℹ️ Cette manifestation est gratuite. Vous pouvez réserver jusqu'à 4 places.
+                            Cette manifestation est gratuite. Vous pouvez réserver jusqu'à 4 places.
                         </div>
                         @if($type === 'atelier' && isset($date))
                             <a href="{{ route('reservations.create.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" class="btn btn-success">
-                                ✓ Réserver gratuitement
+                                Réserver gratuitement
                             </a>
                         @else
                             <a href="{{ route('reservations.create', ['type' => $type, 'id' => $manifestation->idmanif]) }}" class="btn btn-success">
-                                ✓ Réserver gratuitement
+                                Réserver gratuitement
                             </a>
                         @endif
                     @else
-                        <!-- Réservation payante -->
                         <div class="alert alert-warning">
-                            💳 Cette manifestation est payante ({{ number_format($manifestation->prixmanif, 2, ',', ' ') }} € par place). Un paiement sera requis.
+                            Cette manifestation est payante ({{ number_format($manifestation->prixmanif, 2, ',', ' ') }} € par place).
                         </div>
                         @if($type === 'atelier' && isset($date))
-                            <a href="{{ route('reservations.create-payant.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" class="btn btn-warning">
-                                💳 Réserver avec paiement
+                            <a href="{{ route('reservations.create.payant.atelier', ['type' => $type, 'id' => $manifestation->idmanif]) }}" class="btn btn-warning">
+                                Réserver avec paiement
                             </a>
                         @else
-                            <a href="{{ route('reservations.create-payant', ['type' => $type, 'id' => $manifestation->idmanif]) }}" class="btn btn-warning">
-                                💳 Réserver avec paiement
+                            <a href="{{ route('reservations.create.payant', ['type' => $type, 'id' => $manifestation->idmanif]) }}" class="btn btn-warning">
+                                Réserver avec paiement
                             </a>
                         @endif
                     @endif
                 @else
-                    <!-- Plus de places -->
                     <div class="alert alert-error">
-                        ❌ Désolé, il n'y a plus de places disponibles pour cette manifestation.
+                        Il n'y a plus de places disponibles pour cette manifestation.
                     </div>
                     <button class="btn btn-disabled" disabled>Complet</button>
                 @endif
             @else
-                <!-- Utilisateur non connecté -->
                 <div class="login-prompt">
-                    <p>🔒 Vous devez être connecté pour réserver cette manifestation.</p>
-                    <div style="display: flex; gap: 10px; justify-content: center;">
+                    <p>Vous devez être connecté pour réserver cette manifestation.</p>
+                    <div>
                         <a href="{{ route('login') }}" class="btn btn-primary">Se connecter</a>
-                        <a href="{{ route('register') }}" class="btn btn-success">Créer un compte</a>
+                        <a href="{{ route('register') }}" class="btn btn-secondary">Créer un compte</a>
                     </div>
                 </div>
             @endauth
         </div>
         
-        <!-- Section des avis -->
         <div class="avis-section">
             <div class="avis-header">
-                <h3>⭐ Avis des spectateurs</h3>
+                <h3>Avis des spectateurs</h3>
                 @if($totalAvis > 0)
                     <div class="avis-summary">
                         <div class="average-note">
@@ -650,34 +703,32 @@
                         </div>
                     </div>
                 @else
-                    <p style="color: #666; text-align: center; padding: 20px;">
+                    <p style="color: #666; text-align: center; padding: 20px; background: #f9f9f9; border-radius: 3px;">
                         Aucun avis pour le moment. Soyez le premier à donner votre avis !
                     </p>
                 @endif
             </div>
             
-            <!-- Bouton pour ajouter un avis -->
             @auth
                 @if($userHasReservation && !$userHasReviewed)
                     <div class="add-avis-section">
                         @if($type === 'atelier' && isset($date))
                             <a href="{{ route('avis.create.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" class="btn btn-primary">
-                                ✍️ Donner mon avis
+                                Donner mon avis
                             </a>
                         @else
                             <a href="{{ route('avis.create', ['type' => $type, 'id' => $manifestation->idmanif]) }}" class="btn btn-primary">
-                                ✍️ Donner mon avis
+                                Donner mon avis
                             </a>
                         @endif
                     </div>
                 @elseif(!$userHasReservation)
                     <div class="alert alert-info">
-                        ℹ️ Vous devez avoir réservé cette manifestation pour pouvoir donner un avis.
+                        Vous devez avoir réservé cette manifestation pour pouvoir donner un avis.
                     </div>
                 @endif
             @endauth
             
-            <!-- Liste des avis -->
             @if($avis->count() > 0)
                 <div class="avis-list">
                     @foreach($avis as $singleAvis)
@@ -720,10 +771,9 @@
             @endif
         </div>
         
-        <!-- Actions -->
         <div class="actions">
             <a href="{{ route('manifestations.index') }}" class="btn btn-secondary">
-                ← Retour à la liste
+                Retour à la liste
             </a>
             
             @auth

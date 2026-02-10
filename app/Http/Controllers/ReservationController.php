@@ -190,7 +190,6 @@ class ReservationController extends Controller
             'nombre_places.min' => 'Vous devez réserver au moins 1 place',
             'nombre_places.max' => 'Vous ne pouvez pas réserver plus de 4 places',
             'card_number.required' => 'Le numéro de carte est requis',
-            'card_number.digits' => 'Le numéro de carte doit contenir exactement 16 chiffres',
             'card_name.required' => 'Le nom du titulaire est requis',
             'card_expiry.required' => 'La date d\'expiration est requise',
             'card_expiry.size' => 'La date d\'expiration doit être au format MM/AA',

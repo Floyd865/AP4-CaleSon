@@ -13,10 +13,11 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
             min-height: 100vh;
             padding: 20px;
+            color: #333;
         }
 
         .container {
@@ -24,41 +25,57 @@
             margin: 0 auto;
         }
 
+        .back-link {
+            display: inline-block;
+            margin-bottom: 16px;
+            color: #4a90e2;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
         .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
+            background: white;
+            padding: 28px 32px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
         }
 
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        h1 {
+            color: #1a1a1a;
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+        .subtitle {
+            color: #666;
+            font-size: 15px;
         }
 
         .card {
             background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            padding: 28px 32px;
             margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
         }
 
         .manifestation-info {
-            border-left: 4px solid #667eea;
+            border-left: 3px solid #4a90e2;
             padding-left: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
         }
 
         .manifestation-info h2 {
             color: #333;
-            margin-bottom: 15px;
-            font-size: 1.8em;
+            margin-bottom: 16px;
+            font-size: 22px;
+            font-weight: 600;
         }
 
         .info-row {
@@ -67,93 +84,83 @@
             gap: 10px;
             margin-bottom: 10px;
             color: #666;
+            font-size: 14px;
         }
 
         .info-row svg {
-            width: 20px;
-            height: 20px;
-            color: #667eea;
+            width: 18px;
+            height: 18px;
+            color: #999;
+            flex-shrink: 0;
         }
 
         .info-badge {
             display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
-        .badge-gratuit {
-            background: #d1fae5;
-            color: #065f46;
+            padding: 6px 12px;
+            border-radius: 3px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 12px;
+            background: #e8f5e9;
+            color: #2e7d32;
         }
 
         .alert {
-            padding: 15px 20px;
-            border-radius: 8px;
+            padding: 14px 16px;
+            border-radius: 3px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 14px;
+            border-left: 3px solid;
         }
 
         .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border-left: 4px solid #10b981;
+            background: #e8f5e9;
+            border-color: #4caf50;
+            color: #2e7d32;
         }
 
         .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border-left: 4px solid #ef4444;
+            background: #ffebee;
+            border-color: #f44336;
+            color: #c62828;
         }
 
         .alert-warning {
-            background: #fef3c7;
-            color: #92400e;
-            border-left: 4px solid #f59e0b;
+            background: #fff3e0;
+            border-color: #ff9800;
+            color: #e65100;
         }
 
         .alert-info {
-            background: #dbeafe;
-            color: #1e40af;
-            border-left: 4px solid #3b82f6;
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #1565c0;
+        }
+
+        .alert svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 24px;
         }
 
         .form-group label {
             display: block;
-            font-weight: 600;
+            font-weight: 500;
             color: #333;
             margin-bottom: 8px;
-            font-size: 1.05em;
-        }
-
-        .form-group input[type="number"],
-        .form-group select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .form-group input[type="number"]:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            font-size: 15px;
         }
 
         .form-hint {
-            font-size: 14px;
-            color: #6b7280;
+            font-size: 13px;
+            color: #666;
             margin-top: 6px;
             display: block;
         }
@@ -161,8 +168,8 @@
         .places-selector {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 15px;
+            gap: 12px;
+            margin-top: 12px;
         }
 
         .place-option {
@@ -176,54 +183,52 @@
 
         .place-option label {
             display: block;
-            padding: 15px;
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
+            padding: 16px;
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 3px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
+            transition: all 0.2s;
+            font-weight: 500;
         }
 
         .place-option input[type="radio"]:checked + label {
-            background: #667eea;
+            background: #4a90e2;
             color: white;
-            border-color: #667eea;
+            border-color: #4a90e2;
         }
 
         .place-option input[type="radio"]:disabled + label {
-            background: #f3f4f6;
-            color: #9ca3af;
+            background: #f5f5f5;
+            color: #bbb;
             cursor: not-allowed;
-            opacity: 0.5;
+            opacity: 0.6;
         }
 
         .summary {
-            background: #f9fafb;
+            background: #f9f9f9;
             padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
+            border-radius: 3px;
+            margin-bottom: 20px;
         }
 
         .summary h3 {
+            margin-bottom: 16px;
             color: #333;
-            margin-bottom: 15px;
-            font-size: 1.3em;
+            font-size: 16px;
+            font-weight: 600;
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 10px;
+            font-size: 14px;
         }
 
         .summary-row:last-child {
-            border-bottom: none;
-            font-weight: 600;
-            font-size: 1.1em;
-            padding-top: 15px;
+            margin-bottom: 0;
         }
 
         .summary-row .label {
@@ -231,64 +236,59 @@
         }
 
         .summary-row .value {
+            font-weight: 500;
             color: #333;
-            font-weight: 600;
         }
 
         .buttons {
             display: flex;
-            gap: 15px;
-            margin-top: 30px;
+            gap: 12px;
+            margin-top: 24px;
         }
 
         .btn {
-            flex: 1;
-            padding: 15px 30px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 3px;
             cursor: pointer;
-            transition: all 0.3s;
+            font-size: 15px;
+            font-weight: 500;
+            transition: background-color 0.2s;
             text-decoration: none;
-            text-align: center;
             display: inline-block;
         }
 
         .btn-primary {
-            background: #667eea;
+            background: #4a90e2;
             color: white;
         }
 
-        .btn-primary:hover:not(:disabled) {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-primary:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
+        .btn-primary:hover {
+            background: #357abd;
         }
 
         .btn-secondary {
-            background: #e5e7eb;
-            color: #374151;
+            background: #f0f0f0;
+            color: #333;
         }
 
         .btn-secondary:hover {
-            background: #d1d5db;
-        }
-
-        .icon {
-            width: 20px;
-            height: 20px;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 5px;
+            background: #e0e0e0;
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header, .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
             .places-selector {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -301,15 +301,11 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🎫 Réservation</h1>
-            <p>Réservez vos places gratuitement</p>
-        </div>
+        <a href="javascript:history.back()" class="back-link">← Retour</a>
 
-        <!-- Messages de succès/erreur -->
         @if(session('success'))
             <div class="alert alert-success">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {{ session('success') }}
@@ -318,7 +314,7 @@
 
         @if(session('error'))
             <div class="alert alert-error">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {{ session('error') }}
@@ -327,7 +323,7 @@
 
         @if($errors->any())
             <div class="alert alert-error">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
@@ -338,7 +334,11 @@
             </div>
         @endif
 
-        <!-- Informations sur la manifestation -->
+        <div class="header">
+            <h1>Réservation</h1>
+            <p class="subtitle">Réservez vos places gratuitement</p>
+        </div>
+
         <div class="card">
             <div class="manifestation-info">
                 <h2>{{ $manifestation->nommanif }}</h2>
@@ -372,12 +372,12 @@
                     <span><strong>Places restantes :</strong> {{ $placesRestantes }} / {{ $manifestation->effectif_complet }}</span>
                 </div>
 
-                <span class="info-badge badge-gratuit">✓ Gratuit</span>
+                <span class="info-badge">Gratuit</span>
             </div>
 
             @if($placesDejaReservees > 0)
                 <div class="alert alert-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 24px; height: 24px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Vous avez déjà réservé <strong>{{ $placesDejaReservees }}</strong> place(s) pour cette manifestation.
@@ -386,13 +386,12 @@
 
             @if($maxPlacesDisponibles == 0)
                 <div class="alert alert-warning">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 24px; height: 24px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                     Vous avez atteint la limite de 4 places par personne ou il n'y a plus de places disponibles.
                 </div>
             @else
-                <!-- Formulaire de réservation -->
                 @if(isset($type) && $type === 'atelier' && isset($date))
                     <form method="POST" action="{{ route('reservations.store.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" id="reservationForm">
                 @else
@@ -423,9 +422,8 @@
                         </div>
                     </div>
 
-                    <!-- Résumé de la réservation -->
                     <div class="summary">
-                        <h3>📋 Résumé de votre réservation</h3>
+                        <h3>Résumé de votre réservation</h3>
                         <div class="summary-row">
                             <span class="label">Manifestation :</span>
                             <span class="value">{{ $manifestation->nommanif }}</span>
@@ -440,12 +438,12 @@
                         </div>
                         <div class="summary-row">
                             <span class="label">Prix total :</span>
-                            <span class="value" style="color: #10b981;">GRATUIT</span>
+                            <span class="value" style="color: #2e7d32;">GRATUIT</span>
                         </div>
                     </div>
 
                     <div class="alert alert-info">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 24px; height: 24px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                         Vous recevrez un email de confirmation avec vos billets (QR Code) après la réservation.
@@ -454,15 +452,15 @@
                     <div class="buttons">
                         @if(isset($type) && $type === 'atelier' && isset($date))
                             <a href="{{ route('manifestations.show.atelier', ['id' => $manifestation->idmanif, 'date' => $date]) }}" class="btn btn-secondary">
-                                ← Annuler
+                                Annuler
                             </a>
                         @else
                             <a href="{{ route('manifestations.show', ['type' => $type, 'id' => $manifestation->idmanif]) }}" class="btn btn-secondary">
-                                ← Annuler
+                                Annuler
                             </a>
                         @endif
                         <button type="submit" class="btn btn-primary">
-                            ✓ Confirmer la réservation
+                            Confirmer la réservation
                         </button>
                     </div>
                 </form>
@@ -471,7 +469,6 @@
     </div>
 
     <script>
-        // Mise à jour dynamique du résumé
         document.querySelectorAll('input[name="nombre_places"]').forEach(radio => {
             radio.addEventListener('change', function() {
                 const nbPlaces = this.value;
@@ -479,9 +476,7 @@
                 summaryPlaces.textContent = nbPlaces + (nbPlaces > 1 ? ' places' : ' place');
             });
         });
-        });
 
-        // Validation du formulaire
         document.getElementById('reservationForm')?.addEventListener('submit', function(e) {
             const selectedPlaces = document.querySelector('input[name="nombre_places"]:checked');
             if (!selectedPlaces) {

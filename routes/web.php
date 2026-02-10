@@ -4,11 +4,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ManifestationController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\AvisController;
+use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Page d'accueil - utilise WelcomeController pour passer les variables
+Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -37,7 +37,7 @@ Route::get('/manifestations/atelier/{id}/{date}', [ManifestationController::clas
 
 // Routes de réservation (nécessitent l'authentification)
 Route::middleware('auth')->group(function () {
-    // Réservations pour Concert/Conférence/Exposition
+    // Réservations GRATUITES pour Concert/Conférence/Exposition
     Route::get('/manifestations/{type}/{id}/reserver', [ReservationController::class, 'create'])
         ->where('type', 'concert|conference|exposition')
         ->name('reservations.create');
@@ -45,14 +45,15 @@ Route::middleware('auth')->group(function () {
         ->where('type', 'concert|conference|exposition')
         ->name('reservations.store');
     
+    // Réservations PAYANTES pour Concert/Conférence/Exposition
     Route::get('/manifestations/{type}/{id}/reserver-payant', [ReservationController::class, 'createPayant'])
         ->where('type', 'concert|conference|exposition')
-        ->name('reservations.create-payant');
+        ->name('reservations.create.payant');
     Route::post('/manifestations/{type}/{id}/reserver-payant', [ReservationController::class, 'storePayant'])
         ->where('type', 'concert|conference|exposition')
-        ->name('reservations.store-payant');
+        ->name('reservations.store.payant');
     
-    // Réservations pour Atelier (avec date)
+    // Réservations GRATUITES pour Atelier (avec date)
     Route::get('/manifestations/atelier/{id}/{date}/reserver', [ReservationController::class, 'createAtelier'])
         ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}')
         ->name('reservations.create.atelier');
@@ -60,12 +61,13 @@ Route::middleware('auth')->group(function () {
         ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}')
         ->name('reservations.store.atelier');
     
+    // Réservations PAYANTES pour Atelier (avec date)
     Route::get('/manifestations/atelier/{id}/{date}/reserver-payant', [ReservationController::class, 'createPayantAtelier'])
         ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}')
-        ->name('reservations.create-payant.atelier');
+        ->name('reservations.create.payant.atelier');
     Route::post('/manifestations/atelier/{id}/{date}/reserver-payant', [ReservationController::class, 'storePayantAtelier'])
         ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}')
-        ->name('reservations.store-payant.atelier');
+        ->name('reservations.store.payant.atelier');
     
     // Voir mes réservations
     Route::get('/mes-reservations', [ReservationController::class, 'mesReservations'])->name('reservations.index');

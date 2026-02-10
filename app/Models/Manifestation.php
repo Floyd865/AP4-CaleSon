@@ -69,7 +69,8 @@ class Manifestation extends Model
     public static function getFilterOptions()
     {
         // Types disponibles basés sur les tables spécifiques
-        $types = collect(['Concert', 'Conférence', 'Atelier', 'Exposition']);
+        // CORRECTION : Retourner un tableau simple au lieu d'une Collection
+        $types = ['Concert', 'Conférence', 'Atelier', 'Exposition'];
 
         return [
             'types' => $types,
